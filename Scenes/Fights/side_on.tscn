@@ -1,0 +1,57 @@
+[gd_scene load_steps=8 format=3 uid="uid://mnh4vgsllx7h"]
+
+[ext_resource type="Texture2D" uid="uid://cfbf1yppvx5da" path="res://Assets/StonySideView.png" id="1_y74nu"]
+[ext_resource type="PackedScene" uid="uid://dblhihf157xkn" path="res://Scenes/SideCharacters/side_player.tscn" id="2_ne5mw"]
+[ext_resource type="PackedScene" uid="uid://q8eiedgcs38p" path="res://Scenes/SideCharacters/angry_side_guy.tscn" id="4_rnp41"]
+[ext_resource type="Script" uid="uid://dc7ckq7awvtbb" path="res://Scripts/cam_follow_player_side.gd" id="5_fq88e"]
+[ext_resource type="Script" uid="uid://cebap58cylrqv" path="res://Scripts/Components/health_display.gd" id="5_kwm3b"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_o10rv"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_3fpli"]
+font_size = 32
+
+[node name="SideOn" type="Node2D"]
+
+[node name="StonySideView" type="Sprite2D" parent="."]
+texture = ExtResource("1_y74nu")
+offset = Vector2(960, 540)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(0, 754)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("WorldBoundaryShape2D_o10rv")
+
+[node name="SidePlayer" parent="." instance=ExtResource("2_ne5mw")]
+position = Vector2(1227, 417)
+motion_mode = 0
+
+[node name="AngryGuy" parent="." node_paths=PackedStringArray("enemy") instance=ExtResource("4_rnp41")]
+position = Vector2(720, 631)
+enemy = NodePath("../SidePlayer")
+mass = 2.0
+speed = 10.0
+air_speed = 10.0
+in_control = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(960, 533)
+script = ExtResource("5_fq88e")
+
+[node name="HealthDisplay" type="Label" parent="." node_paths=PackedStringArray("character")]
+offset_left = 24.0
+offset_top = 959.0
+offset_right = 129.0
+offset_bottom = 1018.0
+label_settings = SubResource("LabelSettings_3fpli")
+script = ExtResource("5_kwm3b")
+character = NodePath("../SidePlayer")
+
+[node name="HealthDisplay2" type="Label" parent="." node_paths=PackedStringArray("character")]
+offset_left = 1242.0
+offset_top = 998.0
+offset_right = 1347.0
+offset_bottom = 1057.0
+script = ExtResource("5_kwm3b")
+character = NodePath("../AngryGuy")
