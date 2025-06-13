@@ -37,12 +37,12 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("attack"):
-		var actionables = $ActionableFinder.get_overlapping_areas()
-		if actionables.size() == 0:
+	if event.is_action_pressed("interact"):
+		var interacts = $ActionableFinder.get_overlapping_areas()
+		if interacts.size() == 0:
 			return
-		var actionable := actionables[0] as Actionable
-		actionable.action()
+		var interact := interacts[0] as Interactable
+		interact.interact()
 
 # assumes right is 0, in radians
 func dir_to_rot(direction: Direction) -> float:

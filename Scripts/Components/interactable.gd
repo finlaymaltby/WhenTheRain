@@ -1,7 +1,8 @@
-class_name Actionable extends Area2D
+class_name Interactable extends Area2D
 
 @export var dialogue: DialogueResource
 @export var dialogue_start: String = "start"
+@export var balloon: DialogueBalloon
 
 var scene: LocalStory
 
@@ -12,9 +13,9 @@ func _ready() -> void:
 	if get_tree().current_scene is LocalStory:
 		scene = get_tree().current_scene
 	else:
-		push_error("scene root isn't a story? :()")
+		push_error("scene root isn't a story? :(")
 	
 	set_collision_layer_value(5, true)
 		
-func action() -> void:
+func interact() -> void:
 	scene.begin_dialogue(dialogue, dialogue_start)

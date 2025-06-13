@@ -23,7 +23,7 @@ signal finished_typing()
 @export var skip_action: StringName = &"ui_cancel"
 
 ## The speed with which the text types out.
-@export var seconds_per_step: float = 0.02
+@export var seconds_per_step: float = 0.04
 
 ## Automatically have a brief pause when these characters are encountered.
 @export var pause_at_characters: String = ".?!"
