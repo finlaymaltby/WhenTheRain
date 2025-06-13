@@ -35,7 +35,7 @@ var mutation_cooldown: Timer = Timer.new()
 @onready var dialogue_label: DialogueLabel = %DialogueLabel
 
 ## The menu of responses
-@onready var responses_menu: DialogueResponsesMenu = %ResponsesMenu
+@onready var response_menu: DialogueMenu = %ResponseMenu
 
 
 func _ready() -> void:
@@ -45,8 +45,8 @@ func _ready() -> void:
 	mutation_cooldown.timeout.connect(_on_mutation_cooldown_timeout)
 	add_child(mutation_cooldown)
 
-	if not responses_menu.response_selected.is_connected(_on_responses_menu_response_selected):
-		responses_menu.response_selected.connect(_on_responses_menu_response_selected)
+	if not response_menu.response_selected.is_connected(_on_responses_menu_response_selected):
+		response_menu.response_selected.connect(_on_responses_menu_response_selected)
 
 ## Start some dialogue
 func start(dialogue_resource: DialogueResource, title: String, extra_game_states: Array = []) -> void:
@@ -65,8 +65,8 @@ func apply_dialogue_line() -> void:
 	dialogue_label.hide()
 	dialogue_label.dialogue_line = dialogue_line
 
-	responses_menu.hide()
-	responses_menu.responses = dialogue_line.responses
+	response_menu.hide()
+	response_menu.responses = dialogue_line.responses
 
 	show()
 	dialogue_label.show()
@@ -75,7 +75,7 @@ func apply_dialogue_line() -> void:
 		await dialogue_label.finished_typing
 	
 	if dialogue_line.responses.size() > 0:
-		responses_menu.show()
+		response_menu.show()
 
 	elif dialogue_line.time != "":
 		breakpoint

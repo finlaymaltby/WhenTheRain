@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dfkvei8icnjje"]
+[gd_scene load_steps=10 format=3 uid="uid://dfkvei8icnjje"]
 
 [ext_resource type="Script" uid="uid://cewe66a1fglbx" path="res://Scripts/demo.gd" id="1_f2jw5"]
 [ext_resource type="Texture2D" uid="uid://bfqowsjqa5xxp" path="res://Assets/StonyBackground.png" id="1_i22nb"]
@@ -8,9 +8,6 @@
 [ext_resource type="Resource" uid="uid://b4vxpxfb7spfa" path="res://Dialogue/DemoStuff/demo_guy.dialogue" id="5_f2jw5"]
 [ext_resource type="PackedScene" uid="uid://c8rr8smgvfjk4" path="res://Scenes/DialogueBalloon/balloon.tscn" id="7_lvddk"]
 [ext_resource type="Script" uid="uid://dutbdcy34iibi" path="res://Scripts/Dialogue/input_balloon.gd" id="8_qwjex"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_qwjex"]
-radius = 226.153
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lvddk"]
 radius = 83.006
@@ -38,13 +35,6 @@ texture = ExtResource("1_i22nb")
 
 [node name="Player" parent="." instance=ExtResource("2_ul47n")]
 position = Vector2(601, 455)
-
-[node name="PlayerInfluence" type="Area2D" parent="Player"]
-collision_layer = 32
-collision_mask = 0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player/PlayerInfluence"]
-shape = SubResource("CircleShape2D_qwjex")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 

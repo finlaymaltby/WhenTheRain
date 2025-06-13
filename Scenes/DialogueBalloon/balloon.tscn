@@ -2,7 +2,7 @@
 
 [ext_resource type="Theme" uid="uid://bpeymwg5tqo4p" path="res://Resources/UI/default_dark.tres" id="2_6adan"]
 [ext_resource type="PackedScene" uid="uid://ckvgyvclnwggo" path="res://addons/dialogue_manager/dialogue_label.tscn" id="2_a8ve6"]
-[ext_resource type="Script" uid="uid://bb52rsfwhkxbn" path="res://addons/dialogue_manager/dialogue_responses_menu.gd" id="3_72ixx"]
+[ext_resource type="Script" uid="uid://b2nfu7y6mgk4n" path="res://Scripts/Dialogue/response_menu.gd" id="3_gx3xm"]
 
 [node name="DefaultBalloon" type="CanvasLayer"]
 layer = 100
@@ -37,10 +37,14 @@ clip_children = 2
 layout_mode = 2
 mouse_filter = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Balloon/MarginContainer/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="Balloon/MarginContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Balloon/MarginContainer/PanelContainer/MarginContainer"]
 layout_mode = 2
 
-[node name="CharacterLabel" type="RichTextLabel" parent="Balloon/MarginContainer/PanelContainer/VBoxContainer"]
+[node name="CharacterLabel" type="RichTextLabel" parent="Balloon/MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0.501961)
 layout_mode = 2
@@ -51,47 +55,39 @@ text = "Character"
 fit_content = true
 scroll_active = false
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Balloon/MarginContainer/PanelContainer/VBoxContainer"]
+[node name="DialogueContainer" type="HBoxContainer" parent="Balloon/MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 alignment = 1
 
-[node name="VSeparator" type="VSeparator" parent="Balloon/MarginContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="VSeparator" type="VSeparator" parent="Balloon/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/DialogueContainer"]
 layout_mode = 2
 
-[node name="DialogueLabel" parent="Balloon/MarginContainer/PanelContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_a8ve6")]
+[node name="DialogueLabel" parent="Balloon/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/DialogueContainer" instance=ExtResource("2_a8ve6")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
-text = "Dialogue...
-"
+size_flags_vertical = 2
+text = "asdlfjadsflasjf alskdfj
+asdf"
 skip_action = &"cancel"
 seconds_per_step = 0.02
 
-[node name="ResponsesMenu" type="VBoxContainer" parent="Balloon" node_paths=PackedStringArray("response_template")]
+[node name="ResponseMenu" type="HBoxContainer" parent="Balloon/MarginContainer/PanelContainer/MarginContainer/VBoxContainer" node_paths=PackedStringArray("button_template")]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -86.0
-offset_top = 159.0
-offset_right = 495.0
-offset_bottom = 229.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_vertical = 8
-theme_override_constants/separation = 2
-alignment = 1
-script = ExtResource("3_72ixx")
-response_template = NodePath("ResponseExample")
-next_action = &"interact"
-
-[node name="ResponseExample" type="Button" parent="Balloon/ResponsesMenu"]
+visible = false
 layout_mode = 2
-text = "Response example"
+size_flags_vertical = 10
+script = ExtResource("3_gx3xm")
+button_template = NodePath("Option1")
+
+[node name="Option1" type="Button" parent="Balloon/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/ResponseMenu"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+focus_mode = 0
+toggle_mode = true
+button_mask = 0
+text = "Option 1"
 
 [connection signal="gui_input" from="Balloon" to="." method="_on_balloon_gui_input"]
-[connection signal="response_selected" from="Balloon/ResponsesMenu" to="." method="_on_responses_menu_response_selected"]

@@ -1,6 +1,18 @@
-[gd_resource type="Theme" load_steps=4 format=3 uid="uid://bpeymwg5tqo4p"]
+[gd_resource type="Theme" load_steps=9 format=3 uid="uid://bpeymwg5tqo4p"]
 
 [ext_resource type="FontFile" uid="uid://ctsqjhx6cn42g" path="res://Resources/UI/rainyhearts.ttf" id="1_knl32"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3qlr7"]
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_paoj3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gkgib"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gcaj3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_lylii"]
+content_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_knl32"]
 bg_color = Color(0.0901961, 0, 0.176471, 0.898039)
@@ -26,7 +38,16 @@ vertical = true
 [resource]
 default_font = ExtResource("1_knl32")
 default_font_size = 48
+Button/colors/font_color = Color(0.875, 0.875, 0.875, 1)
+Button/colors/font_disabled_color = Color(0.87451, 0.87451, 0.87451, 1)
+Button/colors/font_hover_color = Color(0.87451, 0.87451, 0.87451, 1)
+Button/colors/font_pressed_color = Color(1, 1, 1, 1)
+Button/styles/disabled = SubResource("StyleBoxEmpty_3qlr7")
+Button/styles/focus = SubResource("StyleBoxEmpty_paoj3")
+Button/styles/hover = SubResource("StyleBoxEmpty_gkgib")
+Button/styles/normal = SubResource("StyleBoxEmpty_gcaj3")
+Button/styles/pressed = SubResource("StyleBoxEmpty_lylii")
 DialogueLabel/base_type = &"RichTextLabel"
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_knl32")
-VSeparator/constants/separation = 8
+VSeparator/constants/separation = 16
 VSeparator/styles/separator = SubResource("StyleBoxLine_paoj3")
