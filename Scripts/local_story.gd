@@ -9,3 +9,9 @@ func _ready() -> void:
 
 func begin_dialogue(dialogue: DialogueResource, start: String = "start", balloon: DialogueBalloon = default_balloon) -> void:
 	balloon.start(dialogue, start, [self])
+
+func leave_dialogue(dialogue: DialogueResource, balloon: DialogueBalloon = default_balloon) -> void:
+	if balloon.dialogue != dialogue:
+		push_error("trying to leave dialogue you didn't start")
+		
+	balloon.leave()

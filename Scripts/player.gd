@@ -42,7 +42,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if interacts.size() == 0:
 			return
 		var interact := interacts[0] as Interactable
-		interact.interact()
+		interact.interact(self)
 
 # assumes right is 0, in radians
 func dir_to_rot(direction: Direction) -> float:
