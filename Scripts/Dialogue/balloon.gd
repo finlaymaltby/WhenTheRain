@@ -1,6 +1,8 @@
 class_name DialogueBalloon extends CanvasLayer
 ## Base class for all dialogue balloons
 
+signal finished
+
 ## The dialogue resource
 var dialogue: DialogueResource
 
@@ -105,6 +107,9 @@ func finish() -> void:
 	temporary_game_states = []
 	is_waiting = false
 	hide()
+	response_menu.finish()
+
+	finished.emit()
 
 ## does the dialogue resource have the title (to jump to)
 func has_title(title: String) -> bool:
@@ -112,6 +117,8 @@ func has_title(title: String) -> bool:
 
 ## Jump the dialogue 
 func jump_to(title: String) -> void:
+	is_waiting = false
+	response_menu.responses = []
 	if not has_title(title) and title != DMConstants.ID_END:
 		push_error("dialogue doesn't have the title you wanna jump to: ", title)
 	self.dialogue_line = await dialogue.get_next_dialogue_line(title, temporary_game_states)

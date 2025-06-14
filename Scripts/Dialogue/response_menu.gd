@@ -10,7 +10,8 @@ signal response_selected(response)
 var responses: Array = []:
 	set(value):
 		responses = value
-		make_buttons()
+		if value:
+			make_buttons()
 
 ## Holds the buttons
 var buttons: Array = []
@@ -26,6 +27,7 @@ func _ready() -> void:
 		response_selected.connect(_on_selected)
 
 	visible = false
+	visibility_changed.connect(_on_visible_changed)
 
 func make_buttons() -> void:
 	buttons = []
@@ -41,32 +43,32 @@ func make_buttons() -> void:
 		
 
 func _input(event: InputEvent) -> void:
-	if not visible:
+	if not visible or len(responses) == 0:
 		return
 
 	if event.is_action_pressed("select_left"):
+		get_viewport().set_input_as_handled()
 		response_selected.emit(responses[0])
-		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("select_centre") and len(responses) > 1:
+		get_viewport().set_input_as_handled()
 		response_selected.emit(responses[1])
-		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("select_right") and len(responses) > 2:
-		response_selected.emit(responses[2])
 		get_viewport().set_input_as_handled()
-
+		response_selected.emit(responses[2])
+	
 	
 	elif event.is_action_pressed("ui_left"):
+		get_viewport().set_input_as_handled()
 		buttons[focus_idx].disabled = false
 		focus_idx = (focus_idx - 1) % len(responses)
 		buttons[focus_idx].disabled = true
 		is_focus = true
-		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("ui_right"):
+		get_viewport().set_input_as_handled()
 		buttons[focus_idx].disabled = false
 		focus_idx = (focus_idx + 1) % len(responses)
 		buttons[focus_idx].disabled = true
 		is_focus = true
-		get_viewport().set_input_as_handled()
 	
 	elif event.is_action_pressed("interact") or event.is_action_pressed("ui_accept"):
 		get_viewport().set_input_as_handled()
@@ -75,14 +77,23 @@ func _input(event: InputEvent) -> void:
 			buttons[focus_idx].button_pressed = true
 
 	elif is_focus and (event.is_action_released("interact") or event.is_action_released("ui_accept")):
-		response_selected.emit(responses[focus_idx])
 		get_viewport().set_input_as_handled()
+		response_selected.emit(responses[focus_idx])
+		
 
 
-func _on_selected(response) -> void:
+func finish() -> void:
 	for button in buttons:
 		button.queue_free()
+	buttons = []
 	responses = []
 	focus_idx = 1
 	is_focus = false
 	visible = false
+
+func _on_selected(response) -> void:
+	finish()
+
+func _on_visible_changed() -> void:
+	if not visible:
+		finish()

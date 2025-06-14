@@ -35,5 +35,3 @@ func interact(_interacter: CollisionObject2D) -> void:
 func _on_exited(node: Node2D):
 	scene.leave_dialogue(dialogue)
 	interacter = null
-
-		

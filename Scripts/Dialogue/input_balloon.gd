@@ -10,7 +10,6 @@ func _input(event: InputEvent) -> void:
 
 	if not is_waiting: return 
 	
-	print("here")
 	if event.is_action_pressed("interact"):
 		go_next()
 	
