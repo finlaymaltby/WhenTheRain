@@ -6,13 +6,14 @@ func _ready() -> void:
 	if not default_balloon:
 		push_error("no dialogue balloon given :(")
 	pass
+	
+
 
 func begin_dialogue(dialogue: DialogueResource, start: String = "start", balloon: DialogueBalloon = default_balloon) -> void:
 	balloon.start(dialogue, start, [self])
 
 func leave_dialogue(dialogue: DialogueResource, balloon: DialogueBalloon = default_balloon) -> void:
 	if balloon.dialogue != dialogue:
-		return
 		push_warning("trying to leave dialogue you didn't start")
 		
 	balloon.leave()

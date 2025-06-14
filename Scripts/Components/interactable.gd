@@ -25,13 +25,15 @@ func _ready() -> void:
 		
 	if not area_exited.is_connected(_on_exited):
 		area_exited.connect(_on_exited)
-		
-		
+	
 func interact(_interacter: CollisionObject2D) -> void:
 	scene.begin_dialogue(dialogue, dialogue_start)
 	interacter = _interacter
 	
 
 func _on_exited(node: Node2D):
-	scene.leave_dialogue(dialogue)
+	if not balloon:
+		return
+	if balloon.dialogue == dialogue:
+		scene.leave_dialogue(dialogue)
 	interacter = null

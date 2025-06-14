@@ -133,7 +133,8 @@ func _on_mutation_cooldown_timeout() -> void:
 	push_error("func not configured yet")
 	pass
 
-func _on_mutated() -> void:
+func _on_mutated(mutation: Dictionary) -> void:
+	print(mutation)
 	is_waiting = false
 
 func _on_responses_menu_response_selected(response: DialogueResponse) -> void:

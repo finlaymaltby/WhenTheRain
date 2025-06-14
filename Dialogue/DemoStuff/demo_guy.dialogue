@@ -8,7 +8,7 @@ else
 Demo Guy: Do you think I look [wave]ugly[/wave]?
 Demo Guy: That's okay
 Demo Guy: I was made with [font_size=80]love[/font_size]
-Demo Guy: What a wonderful world we are going to create [wait = 10]. Louis Joel said that. What a time to be alive blah blah blah fillling the text box
+Demo Guy: What a wonderful world we are going to create [wait=2]. Louis Joel said that. What a time to be alive blah blah blah fillling the text box
 Demo Guy: So do you wanna fight or nah
 - yeah
 	do demo_fight()
