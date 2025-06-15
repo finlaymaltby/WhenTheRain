@@ -3,6 +3,8 @@ class_name DialogueBalloon extends CanvasLayer
 
 signal finished
 
+const AUTO_WAIT_TIME: float = 1
+
 ## The dialogue resource
 var dialogue: DialogueResource
 
@@ -15,6 +17,9 @@ var is_waiting: bool = false
 ## A dictionary to store any ephemeral variables
 var locals: Dictionary = {}
 
+## Used in 'next' functions when an override is waiting
+var line_override: String
+
 ## The current line
 var dialogue_line: DialogueLine:
 	set(value):
@@ -26,6 +31,9 @@ var dialogue_line: DialogueLine:
 
 ## A cooldown timer for delaying the balloon hide when encountering a mutation.
 var mutation_cooldown: Timer = Timer.new()
+
+## timer for dialogue waiting in between lines
+var line_wait: Timer = Timer.new()
 
 ## The base balloon anchor
 @onready var balloon: Control = %Balloon
@@ -46,6 +54,7 @@ func _ready() -> void:
 	
 	mutation_cooldown.timeout.connect(_on_mutation_cooldown_timeout)
 	add_child(mutation_cooldown)
+	add_child(line_wait)
 
 	if not response_menu.response_selected.is_connected(_on_responses_menu_response_selected):
 		response_menu.response_selected.connect(_on_responses_menu_response_selected)
@@ -78,23 +87,31 @@ func apply_dialogue_line() -> void:
 	
 	if dialogue_line.responses.size() > 0:
 		response_menu.show()
-
 	elif dialogue_line.time != "":
-		breakpoint
-		var time = dialogue_line.text.length() / 0.04 if dialogue_line.time == "auto" else dialogue_line.time.to_float()
-		await get_tree().create_timer(time).timeout
-		next(dialogue_line.next_id)
+		var time := AUTO_WAIT_TIME if dialogue_line.time == "auto" else dialogue_line.time.to_float()
+		line_wait.start(time)
+		await line_wait.timeout
+		next()
 	else:
-		is_waiting = true
+		when_waiting()
 
+## extra things to do when waiting (e.g. autostart next line)
+func when_waiting() -> void:
+	is_waiting = true
 
-## Go to the next line
-func next(next_id: String) -> void:
+## Go to the set_next line
+func set_next(next_id: String) -> void:
+	if line_override:
+		next_id = line_override
+		line_override = ""
 	self.dialogue_line = await dialogue.get_next_dialogue_line(next_id, temporary_game_states)
 
-## Go to the next line auto
-func go_next() -> void:
+## Go to the set_next line auto
+func next() -> void:
 	var next_id := dialogue_line.next_id
+	if line_override:
+		next_id = line_override
+		line_override = ""
 	self.dialogue_line = await dialogue.get_next_dialogue_line(next_id, temporary_game_states)
 
 ## Call to skip the readout
@@ -110,32 +127,41 @@ func finish() -> void:
 	response_menu.finish()
 
 	finished.emit()
+	print("finishing")
 
 ## does the dialogue resource have the title (to jump to)
 func has_title(title: String) -> bool:
 	return title in dialogue.get_titles()
 
 ## Jump the dialogue 
-func jump_to(title: String) -> void:
-	is_waiting = false
-	response_menu.responses = []
+func jump(title: String) -> void:
 	if not has_title(title) and title != DMConstants.ID_END:
 		push_error("dialogue doesn't have the title you wanna jump to: ", title)
-	self.dialogue_line = await dialogue.get_next_dialogue_line(title, temporary_game_states)
+	
+	line_override = title
+	is_waiting = false
+	response_menu.responses = []
+	dialogue_label.skip_typing()
+	line_wait.timeout.emit()
+
+## Only makes the jump if the current dialogue is the one you're trying to jump in
+func jump_checked(title: String, _dialogue: DialogueResource) -> void:
+	if dialogue != _dialogue:
+		return 
+	jump(title)
 
 func leave() -> void:
 	if has_title("on_leave"):
-		jump_to("on_leave")
+		jump("on_leave")
 	else:
-		jump_to(DMConstants.ID_END)
+		jump(DMConstants.ID_END)
 
 func _on_mutation_cooldown_timeout() -> void:
 	push_error("func not configured yet")
 	pass
 
 func _on_mutated(mutation: Dictionary) -> void:
-	print(mutation)
 	is_waiting = false
 
 func _on_responses_menu_response_selected(response: DialogueResponse) -> void:
-	next(response.next_id)
+	set_next(response.next_id)

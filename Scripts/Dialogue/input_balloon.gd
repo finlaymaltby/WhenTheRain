@@ -11,7 +11,7 @@ func _input(event: InputEvent) -> void:
 	if not is_waiting: return 
 	
 	if event.is_action_pressed("interact"):
-		go_next()
+		next()
 	
 	elif event.is_action_pressed("cancel") and dialogue_label.is_typing:
 		get_viewport().set_input_as_handled()

@@ -31,6 +31,10 @@ func run() -> bool:
 	return has_fired
 
 ## Adds the event handler to list of overrides
-func override(overriding_event: PEventHandler) -> PEventHandler:
+func with_override(overriding_event: PEventHandler) -> PEventHandler:
 	overrides.append(overriding_event)
+	return self
+
+func with_overrides(overriding_events: Array[PEventHandler]) -> PEventHandler:
+	overrides.append_array(overriding_events)
 	return self

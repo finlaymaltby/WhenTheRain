@@ -1,23 +1,23 @@
-class_name CombatBrain extends Resource
+class_name CombatBrain extends Node
+
+@export var body: CombatCharacter 
+
+func _ready() -> void:
+	if not body:
+		if get_parent() is CombatCharacter:
+			push_warning("assuming parent is body")
+			body = get_parent()
+		else:
+			push_error("no body :(")
 
 func tie(event: PEvent, on_fire: Callable) -> PEventHandler:
 	return PEventHandler.from(event, on_fire)
 
-var handler: PEventHandler = tie(PEvent.Always.new(), nothing).override(
-		tie(PEvent.EnemyNear.from_dist(200), on_near)
-	).override(
-		tie(PEvent.EnemyAirborne.new(), aire)
-	)
+var handler: PEventHandler
+
+func _process(delta: float) -> void:
+	handler.run()
 
 func update_and_run(state: PEvent.State) -> void:
 	handler.update(state)
 	handler.run()
-
-func nothing():
-	print("nothing is happening")
-
-func on_near():
-	print("aah you're close")
-
-func aire():
-	print("youre in the air!")

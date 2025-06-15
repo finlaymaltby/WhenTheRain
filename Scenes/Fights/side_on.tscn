@@ -1,10 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://mnh4vgsllx7h"]
+[gd_scene load_steps=11 format=3 uid="uid://mnh4vgsllx7h"]
 
+[ext_resource type="PackedScene" uid="uid://c8rr8smgvfjk4" path="res://Scenes/DialogueBalloon/balloon.tscn" id="1_21djm"]
 [ext_resource type="Texture2D" uid="uid://cfbf1yppvx5da" path="res://Assets/StonySideView.png" id="1_y74nu"]
+[ext_resource type="Script" uid="uid://dk3e3xktli8c3" path="res://Scripts/Dialogue/auto_balloon.gd" id="2_10vrj"]
 [ext_resource type="PackedScene" uid="uid://dblhihf157xkn" path="res://Scenes/SideCharacters/side_player.tscn" id="2_ne5mw"]
 [ext_resource type="PackedScene" uid="uid://q8eiedgcs38p" path="res://Scenes/SideCharacters/angry_side_guy.tscn" id="4_rnp41"]
 [ext_resource type="Script" uid="uid://dc7ckq7awvtbb" path="res://Scripts/cam_follow_player_side.gd" id="5_fq88e"]
 [ext_resource type="Script" uid="uid://cebap58cylrqv" path="res://Scripts/Components/health_display.gd" id="5_kwm3b"]
+[ext_resource type="Resource" uid="uid://btobqjhtrblyk" path="res://Dialogue/DemoStuff/demo_fight.dialogue" id="6_10vrj"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_o10rv"]
 
@@ -12,6 +15,9 @@
 font_size = 32
 
 [node name="SideOn" type="Node2D"]
+
+[node name="DefaultBalloon" parent="." instance=ExtResource("1_21djm")]
+script = ExtResource("2_10vrj")
 
 [node name="StonySideView" type="Sprite2D" parent="."]
 texture = ExtResource("1_y74nu")
@@ -24,16 +30,16 @@ position = Vector2(0, 754)
 shape = SubResource("WorldBoundaryShape2D_o10rv")
 
 [node name="SidePlayer" parent="." instance=ExtResource("2_ne5mw")]
-position = Vector2(1227, 417)
+position = Vector2(1438, 534)
 motion_mode = 0
 
-[node name="AngryGuy" parent="." node_paths=PackedStringArray("enemy") instance=ExtResource("4_rnp41")]
-position = Vector2(720, 631)
+[node name="AngryGuy" parent="." node_paths=PackedStringArray("balloon", "enemy") instance=ExtResource("4_rnp41")]
+position = Vector2(182, 582)
+dialogue = ExtResource("6_10vrj")
+balloon = NodePath("../DefaultBalloon")
 enemy = NodePath("../SidePlayer")
-mass = 2.0
 speed = 10.0
 air_speed = 10.0
-in_control = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 533)
