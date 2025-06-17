@@ -1,6 +1,5 @@
 class_name Attack extends Area2D
 
-signal reduced_to_zero
 signal blocked
 
 ## The stats the attack starts with
@@ -47,16 +46,12 @@ func _physics_process(delta: float) -> void:
 	for area in get_overlapping_areas():
 		if area is HurtBox and (area not in already_hit):
 			try_hit(area)
-			var dir := global_transform.basis_xform(Vector2.RIGHT)
-			area.hit_me(stats, dir)
-			already_hit.append(area)
-
 
 ## attemps to hit the hurtbox, by testing if it has los and if so, making it take damage
 func try_hit(hurt: HurtBox) -> void:
 	# aim ray at target
 	ray.position = Vector2.ZERO
-	ray.target_position = global_transform.inverse() * hurt.global_position
+	ray.target_position = hurt.global_position - ray.global_position
 
 	var stats := max_stats.duplicate()
 	ray.enabled = true
@@ -67,6 +62,7 @@ func try_hit(hurt: HurtBox) -> void:
 			push_error("something went wrong here, check ray collision")
 		
 		var obj = ray.get_collider()
+		
 		if not obj is HurtBox:
 			# hitting something we can't damage
 			return 
@@ -77,31 +73,24 @@ func try_hit(hurt: HurtBox) -> void:
 			break
 
 		if obj.get_collision_layer_value(4) or (obj.get_collision_layer_value(3) and pierce):
-			breakpoint
+			stats = obj.reduce(stats)
+			if stats.is_zero():
+				# attack has been entirely blocked
+				return
+		
+		# stop the ray from colliding with this object again and keep going
+		ray.add_exception(obj)
+	
 		
 	# if reached the end of loop, we must have hit the object
 	var dir := global_transform.basis_xform(Vector2.RIGHT)
 	hurt.hit_me(stats, dir)
 	already_hit.append(hurt)
+	ray.enabled = false
+	ray.clear_exceptions()
 
-func has_los(area: Area2D) -> bool:
-	ray.enabled = true
-	ray.force_raycast_update()
-	
 
-	if ray.is_colliding():
-		var obj = ray.get_collider()
-		ray.queue_free()
-		return obj == area
-	return true
 
-func reduce(stop_stats: StatBlock) -> void:
-	stats.reduce(stop_stats)
-	if stats.is_zero():
-		is_active = false
-		reduced_to_zero.emit()
-
-	
 func block(shield: ShieldBox) -> void:
 	push_error("should be defined in inherited class")
 	blocked.emit()

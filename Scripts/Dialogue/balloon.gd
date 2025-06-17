@@ -127,7 +127,7 @@ func finish() -> void:
 	response_menu.finish()
 
 	finished.emit()
-	print("finishing")
+
 
 ## does the dialogue resource have the title (to jump to)
 func has_title(title: String) -> bool:

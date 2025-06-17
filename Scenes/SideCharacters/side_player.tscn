@@ -5,13 +5,13 @@
 [ext_resource type="Script" uid="uid://cqiy0c1ux3u11" path="res://Scripts/Components/health_component.gd" id="3_s28mu"]
 [ext_resource type="Script" uid="uid://b01wmptn1yb2f" path="res://Scripts/Components/hurt_box.gd" id="4_441tw"]
 [ext_resource type="Resource" uid="uid://0712inn535qv" path="res://Resources/Stats/Weights/flesh_damage.tres" id="4_o6yy0"]
-[ext_resource type="Script" uid="uid://cdmve1r430ta1" path="res://Scripts/Combat/Components/stat_block.gd" id="4_rqu4s"]
 [ext_resource type="Texture2D" uid="uid://bkskuyo3ugwg6" path="res://Assets/Medieval Warrior Sprites/Attack1.png" id="5_ig6c3"]
 [ext_resource type="Texture2D" uid="uid://cgxleraxtwo8n" path="res://Assets/Medieval Warrior Sprites/Idle.png" id="6_go6fo"]
 [ext_resource type="Script" uid="uid://dxi040henumdl" path="res://Scripts/Combat/Components/shield_box.gd" id="6_h4aua"]
 [ext_resource type="Resource" uid="uid://dxah4vj7wxcdp" path="res://Resources/Stats/Attacks/sword_swing.tres" id="6_obrvc"]
 [ext_resource type="Texture2D" uid="uid://cysru6cr1mpii" path="res://Assets/Medieval Warrior Sprites/Run.png" id="7_c8pa8"]
 [ext_resource type="Script" uid="uid://bc3xcglak66j2" path="res://Scripts/Combat/Components/melee_attack.gd" id="8_cr60g"]
+[ext_resource type="Script" uid="uid://cdmve1r430ta1" path="res://Scripts/Combat/Components/stat_block.gd" id="8_oqmc8"]
 [ext_resource type="Texture2D" uid="uid://8372b5ocdin4" path="res://Assets/shield.png" id="10_psbv2"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ts066"]
@@ -25,10 +25,11 @@ height = 172.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_m55uf"]
 size = Vector2(127, 138)
 
-[sub_resource type="Resource" id="Resource_lj370"]
-script = ExtResource("4_rqu4s")
-slice = 20.0
-smash = 10.0
+[sub_resource type="Resource" id="Resource_44c4j"]
+script = ExtResource("8_oqmc8")
+slice = 0.15
+smash = 0.75
+metadata/_custom_type_script = "uid://cdmve1r430ta1"
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5wxro"]
 radius = 22.0
@@ -556,11 +557,10 @@ damage_weight = ExtResource("4_o6yy0")
 [node name="PlayerHurtBoxCollision" type="CollisionShape2D" parent="PlayerHurtBox"]
 shape = SubResource("CapsuleShape2D_4uu6h")
 
-[node name="Sword" type="Area2D" parent="." node_paths=PackedStringArray("character")]
+[node name="Sword" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 4
 script = ExtResource("8_cr60g")
-character = NodePath("..")
 max_stats = ExtResource("6_obrvc")
 is_active = false
 
@@ -568,13 +568,16 @@ is_active = false
 position = Vector2(126, -1)
 shape = SubResource("RectangleShape2D_m55uf")
 
-[node name="Shield" type="Area2D" parent="."]
-collision_layer = 8
-collision_mask = 2
+[node name="Shield" type="Area2D" parent="." node_paths=PackedStringArray("health", "character")]
+collision_layer = 12
+collision_mask = 0
 monitoring = false
 monitorable = false
 script = ExtResource("6_h4aua")
-stats = SubResource("Resource_lj370")
+health = NodePath("../HealthComponent")
+character = NodePath("..")
+damage_weight = SubResource("Resource_44c4j")
+fortitude = 100.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Shield"]
 position = Vector2(56, -1)

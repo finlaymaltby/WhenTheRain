@@ -32,14 +32,16 @@ shape = SubResource("WorldBoundaryShape2D_o10rv")
 [node name="SidePlayer" parent="." instance=ExtResource("2_ne5mw")]
 position = Vector2(1438, 534)
 motion_mode = 0
+jump_speed = 15.0
 
 [node name="AngryGuy" parent="." node_paths=PackedStringArray("balloon", "enemy") instance=ExtResource("4_rnp41")]
-position = Vector2(182, 582)
+position = Vector2(554, 569)
 dialogue = ExtResource("6_10vrj")
 balloon = NodePath("../DefaultBalloon")
 enemy = NodePath("../SidePlayer")
 speed = 10.0
 air_speed = 10.0
+in_control = false
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 533)
@@ -59,5 +61,6 @@ offset_left = 1242.0
 offset_top = 998.0
 offset_right = 1347.0
 offset_bottom = 1057.0
+theme_override_font_sizes/font_size = 70
 script = ExtResource("5_kwm3b")
 character = NodePath("../AngryGuy")

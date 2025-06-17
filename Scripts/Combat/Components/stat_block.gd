@@ -15,13 +15,22 @@ static func from_vec(damage: Vector3) -> StatBlock:
 	stats.damage = damage
 	return stats
 
-	
 func dot(other: StatBlock) -> float:
 	return (slice * other.slice) + (smash * other.smash)
 
-func reduce(other: StatBlock) -> void:
-	slice = clampf(slice - other.slice, 0, INF)
-	smash = clampf(smash - other.smash, 0, INF)
+## multiply each component of the stat block by a scalar
+func times(scalar: float) -> StatBlock:
+	var new := self.duplicate()
+	new.slice *= scalar
+	new.smash *= scalar
+	return new
+
+## subtract another statblock, clamping values to be >= 0
+func take(other: StatBlock) -> StatBlock:
+	var new := self.duplicate()
+	new.slice = clampf(slice - other.slice, 0, INF)
+	new.smash = clampf(smash - other.smash, 0, INF)
+	return
 
 func sum() -> float:
 	return slice + smash
