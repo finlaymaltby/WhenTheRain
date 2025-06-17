@@ -11,6 +11,10 @@ class_name HurtBox extends Area2D
 ## i.e. for a person (0.95,0.4)
 @export var damage_weight: StatBlock
 
+## minimum damage required to cause any damage to health
+## effective damage = clamp(incoming damage - fortitude, 0, inf) 
+@export var fortitude: float = 0
+
 ## impulse = damage_vec.dot(knockback_weight)
 ## What proportion of damage goes to knockback
 ## delta_v = (impulse/mass) 
@@ -35,7 +39,10 @@ func _ready() -> void:
 		push_error("no knockback weight found on ready")
 		
 func hit_me(damage: StatBlock, dir: Vector2) -> void:
-	health.heal(-damage.dot(damage_weight))
+	var d := damage.dot(damage_weight)
+	d = clampf(d - fortitude, 0, INF)
+	
+	health.heal(-d)
 	character.knockback(dir * damage.dot(knockback_weight))
 	
 	

@@ -5,44 +5,86 @@ signal blocked
 
 ## The stats the attack starts with
 @export var max_stats: StatBlock
+
+## does the attack pierce through bodies that aren't listed on teh physical body layer
+@export var pierce: bool = true
+
+## Whether the attack is currently active and 
 @export var is_active: bool = true:
 	set(value):
 		if value and not is_active:
-			activate()
+			already_hit = []
 			
 		is_active = value
 		set_deferred("monitorable", is_active)
 		set_deferred("monitoring", is_active)
-		
-var stats : StatBlock
+	
+## The hurt boxes that have already been damaged by the attack
 var already_hit: Array[HurtBox] = []
+## the ray used to detect los 
+var ray: RayCast2D
 
 func _ready() -> void:
-	if max_stats == null:
+	if not max_stats:
 		push_error("no max_stats found onready")
 
-	
-func activate() -> void:
-	stats = max_stats.duplicate()
-	already_hit = []
+	ray = RayCast2D.new()
+	add_child(ray)
+	ray.collide_with_areas = true
+	ray.collide_with_bodies = true
+	ray.collision_mask = 0
+	# set the ray to collide with hurtboxes and physical objects
+	ray.set_collision_mask_value(3,true)
+	ray.set_collision_mask_value(4,true)
+	ray.exclude_parent = true
+	ray.hit_from_inside = false
+	ray.enabled = false
 
 func _physics_process(delta: float) -> void:
 	if not is_active:
 		return
 
 	for area in get_overlapping_areas():
-		if area is HurtBox and has_los(area) and (area not in already_hit):
+		if area is HurtBox and (area not in already_hit):
+			try_hit(area)
 			var dir := global_transform.basis_xform(Vector2.RIGHT)
 			area.hit_me(stats, dir)
 			already_hit.append(area)
 
+
+## attemps to hit the hurtbox, by testing if it has los and if so, making it take damage
+func try_hit(hurt: HurtBox) -> void:
+	# aim ray at target
+	ray.position = Vector2.ZERO
+	ray.target_position = global_transform.inverse() * hurt.global_position
+
+	var stats := max_stats.duplicate()
+	ray.enabled = true
+
+	while true:
+		ray.force_raycast_update()
+		if not ray.is_colliding():
+			push_error("something went wrong here, check ray collision")
+		
+		var obj = ray.get_collider()
+		if not obj is HurtBox:
+			# hitting something we can't damage
+			return 
+		obj = obj as HurtBox
+
+		# test if hitting the target
+		if obj == hurt: 
+			break
+
+		if obj.get_collision_layer_value(4) or (obj.get_collision_layer_value(3) and pierce):
+			breakpoint
+		
+	# if reached the end of loop, we must have hit the object
+	var dir := global_transform.basis_xform(Vector2.RIGHT)
+	hurt.hit_me(stats, dir)
+	already_hit.append(hurt)
+
 func has_los(area: Area2D) -> bool:
-	var ray := RayCast2D.new()
-	add_child(ray)
-	ray.collide_with_areas = true
-	ray.collision_mask = 0
-	ray.set_collision_mask_value(4,true)
-	ray.target_position = global_transform.inverse() * area.global_position
 	ray.enabled = true
 	ray.force_raycast_update()
 	
@@ -51,7 +93,6 @@ func has_los(area: Area2D) -> bool:
 		var obj = ray.get_collider()
 		ray.queue_free()
 		return obj == area
-	ray.queue_free()
 	return true
 
 func reduce(stop_stats: StatBlock) -> void:
