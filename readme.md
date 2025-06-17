@@ -4,7 +4,7 @@ TODO:
     - FIX THE SHIELD 
 - FIX all that
 - Get buttons to use godot native focus + fix hacky pressed focus 'solution'
-
+Attach pevent update to a state update signal
 - Components can assume their parent is the combat body they cares about if needsed
 - Combat body changes:
     - ADD DESCRIPTION TO COMBATBODY STATS 
