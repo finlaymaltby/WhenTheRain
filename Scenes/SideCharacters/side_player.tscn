@@ -532,11 +532,9 @@ motion_mode = 1
 script = ExtResource("1_coe3w")
 health = NodePath("HealthComponent")
 mass = 1.0
-speed = 300.0
-drag = 2.0
-jump_speed = 800.0
-air_speed = 300.0
-air_drag = 1.0
+speed = 3.0
+jump_speed = 4.0
+air_speed = 3.0
 in_control = true
 
 [node name="HealthComponent" type="Node" parent="."]

@@ -5,19 +5,25 @@ signal turned(move_dir: Vector2)
 var facing_right = true
 
 @export var health: HealthComponent
+
 ## mass used to calulate knockback: J/m = v2 - v1
 @export var mass: float 
 ## speed of character under their control on ground
+## :: 100px per sec
 @export var speed: float
 ## deceleration v -= drag * v * delta
-@export var drag: float
+## :: per sec
+@export var drag: float = 2.0
 
-## how quick they go up in jump
+## vertical impulse when jumping
+## :: 100px per sec
 @export var jump_speed: float
-## how fast are they in the air
+## speed of character in the air
+## :: 100px per sec
 @export var air_speed: float
-## deceleration in air
-@export var air_drag: float
+## deceleration v -= drag * v * delta
+## :: per sec
+@export var air_drag: float = 1.0
 
 ## is the player in control of their movement, i.e. been stunned
 @export var in_control: bool
@@ -54,9 +60,6 @@ func get_move_dir() -> Vector2:
 ## Call do decide the character's velocity
 ## Returns (movetype, turned_arond
 func process_movement(delta: float) -> MoveType:
-	if velocity.length() > 1000:
-		pass
-		#breakpoint
 	var move_dir := get_move_dir()
 	var move_type := MoveType.STILL
 	
@@ -65,23 +68,23 @@ func process_movement(delta: float) -> MoveType:
 		velocity.x -= sign(velocity.x) * min(abs(velocity.x)*air_drag*delta, abs(velocity.x))
 
 		if in_control:
-			if abs(velocity.x) <= air_speed:
+			if abs(velocity.x) <= air_speed*100:
 				if sign(velocity.x) != move_dir.x and move_dir.x != 0:
 					turned.emit(move_dir)
-				velocity.x = move_dir.x * air_speed
+				velocity.x = move_dir.x * air_speed * 100
 				
 		move_type = MoveType.FALLING
 	else:
-		velocity.y = jump_speed * move_dir.y
+		velocity.y = jump_speed * move_dir.y * 100
 		
 		velocity.x -= sign(velocity.x) * min(abs(velocity.x)*drag*delta, abs(velocity.x))
 			
 		move_type = MoveType.SLIDING
 		if in_control:
-			if abs(velocity.x) <= air_speed:
+			if abs(velocity.x) <= speed*100:
 				if sign(velocity.x) != move_dir.x and move_dir.x != 0:
 					turned.emit(move_dir)
-				velocity.x = move_dir.x * air_speed
+				velocity.x = move_dir.x * speed * 100
 				move_type = MoveType.WALKING
 		
 	if velocity == Vector2.ZERO:
@@ -91,7 +94,7 @@ func process_movement(delta: float) -> MoveType:
 	
 func knockback(impulse: Vector2) -> void:
 	# delta v due to impulse
-	var delta_v := (impulse/mass)
+	var delta_v := (impulse/mass) * 100
 	# player velocity in direction of impulse
 	var s := velocity.dot(delta_v.normalized())
 	# player is going ina opposite direction to knockback

@@ -1,5 +1,4 @@
-extends Area2D
-class_name ShieldBox
+class_name ShieldBox extends Area2D
 
 @export var stats: StatBlock
 @export var is_active: bool = false:

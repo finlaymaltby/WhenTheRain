@@ -14,7 +14,6 @@ var enemy_close := PEvent.EnemyNear.from_dist(DIST_CLOSE)
 var handler: PEventHandler = tie(PEvent.Always.new(), default).with_overrides(
 	[
 		tie(PEvent.EnemyNear.from_dist(DIST_CLOSE).given(PEvent.EnemyAdvances.new()), func(): 
-			print("kaboom")
 			balloon.jump_checked("_on_approach", dialogue)
 			),
 	]
