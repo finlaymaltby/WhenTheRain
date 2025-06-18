@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=3 uid="uid://q8eiedgcs38p"]
+[gd_scene load_steps=44 format=3 uid="uid://vixe5s0ft7i"]
 
 [ext_resource type="Script" uid="uid://cylvf3egj10ls" path="res://entities/angry_guy/combat/angry_side_guy.gd" id="1_s53i8"]
 [ext_resource type="Script" uid="uid://cqiy0c1ux3u11" path="res://utils/components/health_component.gd" id="3_3syi6"]

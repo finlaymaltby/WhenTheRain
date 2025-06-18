@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://dk3e3xktli8c3" path="res://ui/dialogue/scripts/auto_balloon.gd" id="2_hjnim"]
 [ext_resource type="Texture2D" uid="uid://cfbf1yppvx5da" path="res://fights/demo_fight/StonySideView.png" id="3_k1oqk"]
 [ext_resource type="PackedScene" uid="uid://dblhihf157xkn" path="res://entities/player/combat/player_combat.tscn" id="4_pi853"]
-[ext_resource type="PackedScene" uid="uid://q8eiedgcs38p" path="res://entities/angry_guy/combat/angry_side_guy.tscn" id="5_rmmsv"]
+[ext_resource type="PackedScene" uid="uid://vixe5s0ft7i" path="res://entities/angry_guy/combat/angry_side_guy.tscn" id="5_rmmsv"]
 [ext_resource type="Resource" uid="uid://btobqjhtrblyk" path="res://fights/demo_fight/demo_fight.dialogue" id="6_kyqyg"]
 [ext_resource type="Script" uid="uid://cebap58cylrqv" path="res://ui/health_display.gd" id="7_l2t7t"]
 
