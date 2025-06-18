@@ -3,7 +3,7 @@ class_name MeleeHitbox extends HitBox
 signal parried
 
 ## The stats the attack starts with
-@export var max_stats: StatBlock
+@export var max_stats: DamageStats
 
 ## does the attack pierce through bodies that aren't listed on teh physical body layer
 @export var pierce: bool = true

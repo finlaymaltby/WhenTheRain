@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="AttackStats" load_steps=2 format=3 uid="uid://dxah4vj7wxcdp"]
+[gd_resource type="Resource" script_class="AttackStats" load_steps=3 format=3 uid="uid://cq30m3nxtjea1"]
 
+[ext_resource type="Resource" uid="uid://bdttdg6gtqth8" path="res://entities/player/combat/data/sword_swing_damage.tres" id="1_dqej0"]
 [ext_resource type="Script" uid="uid://d4f3qxk3hrx0e" path="res://utils/combat/combat_components/attack_stats.gd" id="1_jsum8"]
 
 [resource]
 script = ExtResource("1_jsum8")
+damage = ExtResource("1_dqej0")
 attack_range = 0.0
 prep_time = 0.0
 recovery_time = 0.0

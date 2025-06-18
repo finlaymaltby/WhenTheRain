@@ -1,7 +1,7 @@
 class_name AttackStats extends Resource
 
 ## the damage the attack will do 
-@export var damage: StatBlock
+@export var damage: DamageStats
 
 ## how many pixels you would have to be away 
 @export var attack_range: float

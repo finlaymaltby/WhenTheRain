@@ -11,11 +11,11 @@ class_name HurtBox extends Area2D
 ## Because a statblock intends to represent every type of damage and everything has some vulnerability,
 ## The values should sum to 1 to represent the total vulnerabilties
 ## i.e. for a person (0.8,0.2)
-@export var damage_weight: StatBlock
+@export var damage_weight: DamageStats
 
 ## minimum damage required to cause any damage to health
 ## effective damage = clamp(incoming damage - fortitude, 0, inf) 
-@export var fortitude: float = 0
+@export var fortitude: float = -1
 
 @export var coll_shape: CollisionShape2D
 
@@ -45,11 +45,12 @@ func _ready() -> void:
 		for child in get_children():
 			if child is CollisionShape2D:
 				coll_shape = child
-
 	
+	if fortitude == -1:
+		push_error("fortitude is not set")
 
 ## take a hit, applying damage and knockback in direction
-func hit_me(damage: StatBlock, dir: Vector2) -> void:
+func hit_me(damage: DamageStats, dir: Vector2) -> void:
 	var d := damage.dot(damage_weight)
 	d = clampf(d - fortitude, 0, INF)
 	
@@ -57,7 +58,7 @@ func hit_me(damage: StatBlock, dir: Vector2) -> void:
 	character.knockback(dir * damage.dot(knockback_weight))
 	
 ## uses the body's fortitude to reduce the damage for the next thing, reducing it to zero
-func reduce(damage: StatBlock) -> StatBlock:
+func reduce(damage: DamageStats) -> DamageStats:
 	# calculate the amount of damage the hurt box would be able to withstand
 	var dmg := damage.dot(damage_weight)
 	var reduced := clampf(dmg - fortitude, 0, INF)

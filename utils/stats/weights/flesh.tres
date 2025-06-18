@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="DamageStats" load_steps=2 format=3 uid="uid://tvj4nbmjgmat"]
+
+[ext_resource type="Script" uid="uid://1mtktothypu5" path="res://utils/combat/combat_components/damage_stats.gd" id="1_7skrw"]
+
+[resource]
+script = ExtResource("1_7skrw")
+slice = 0.85
+smash = 0.15
+metadata/_custom_type_script = "uid://1mtktothypu5"

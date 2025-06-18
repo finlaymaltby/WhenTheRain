@@ -3,17 +3,17 @@
 [ext_resource type="Script" uid="uid://vxqbtq6nn357" path="res://entities/player/combat/combat_player.gd" id="1_coe3w"]
 [ext_resource type="Script" uid="uid://dimrow4eq0trj" path="res://utils/combat/combat_components/one_weapon_manager.gd" id="3_2yu7q"]
 [ext_resource type="Script" uid="uid://cqiy0c1ux3u11" path="res://utils/components/health_component.gd" id="3_s28mu"]
+[ext_resource type="Resource" uid="uid://tvj4nbmjgmat" path="res://utils/stats/weights/flesh.tres" id="4_12epr"]
 [ext_resource type="Script" uid="uid://b01wmptn1yb2f" path="res://utils/components/hurt_box.gd" id="4_441tw"]
-[ext_resource type="Resource" uid="uid://0712inn535qv" path="res://utils/stats/weights/flesh_damage.tres" id="4_o6yy0"]
 [ext_resource type="Texture2D" uid="uid://bkskuyo3ugwg6" path="res://entities/player/sprites/Medieval Warrior Sprites/Attack1.png" id="5_ig6c3"]
 [ext_resource type="Script" uid="uid://ddcen4g2pqeue" path="res://utils/combat/combat_components/melee_hitbox.gd" id="5_qyf1b"]
 [ext_resource type="Script" uid="uid://dex21j6pxwq8r" path="res://entities/player/combat/weapons/sword.gd" id="6_4ej45"]
 [ext_resource type="Texture2D" uid="uid://cgxleraxtwo8n" path="res://entities/player/sprites/Medieval Warrior Sprites/Idle.png" id="6_go6fo"]
 [ext_resource type="Script" uid="uid://dxi040henumdl" path="res://utils/combat/combat_components/shield_box.gd" id="6_h4aua"]
 [ext_resource type="Texture2D" uid="uid://cysru6cr1mpii" path="res://entities/player/sprites/Medieval Warrior Sprites/Run.png" id="7_c8pa8"]
-[ext_resource type="Resource" uid="uid://br8wb8ycckdjq" path="res://utils/stats/weights/steel_damage.tres" id="7_vaekp"]
-[ext_resource type="Resource" uid="uid://dxah4vj7wxcdp" path="res://entities/player/combat/data/sword_swing.tres" id="8_6wkee"]
+[ext_resource type="Resource" uid="uid://bdttdg6gtqth8" path="res://entities/player/combat/data/sword_swing_damage.tres" id="8_4ej45"]
 [ext_resource type="Script" uid="uid://bxeo1xdihesvg" path="res://entities/player/combat/weapons/shield.gd" id="9_hrtpv"]
+[ext_resource type="Resource" uid="uid://chvh258se7k" path="res://utils/stats/weights/steel.tres" id="10_4ej45"]
 [ext_resource type="Texture2D" uid="uid://8372b5ocdin4" path="res://entities/player/sprites/shield.png" id="10_psbv2"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ts066"]
@@ -438,10 +438,10 @@ tracks/4/path = NodePath("OneWeaponManager/Shield/ShieldBlock:is_active")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.6),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
-"values": [false, true]
+"values": [false, false, true]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
@@ -598,7 +598,8 @@ collision_mask = 0
 script = ExtResource("4_441tw")
 health = NodePath("../HealthComponent")
 character = NodePath("..")
-damage_weight = ExtResource("4_o6yy0")
+damage_weight = ExtResource("4_12epr")
+fortitude = 0.0
 metadata/_custom_type_script = "uid://b01wmptn1yb2f"
 
 [node name="PlayerHurtBoxCollision" type="CollisionShape2D" parent="PlayerHurtBox"]
@@ -618,7 +619,7 @@ metadata/_custom_type_script = "uid://ds7nl8eog7r3g"
 collision_layer = 2
 collision_mask = 4
 script = ExtResource("5_qyf1b")
-max_stats = ExtResource("8_6wkee")
+max_stats = ExtResource("8_4ej45")
 is_active = false
 metadata/_custom_type_script = "uid://ddcen4g2pqeue"
 
@@ -633,6 +634,7 @@ animation_player = NodePath("../../AnimationPlayer")
 metadata/_custom_type_script = "uid://ds7nl8eog7r3g"
 
 [node name="ShieldBlock" type="Area2D" parent="OneWeaponManager/Shield" node_paths=PackedStringArray("health", "character")]
+position = Vector2(68, 0)
 collision_layer = 12
 collision_mask = 0
 monitoring = false
@@ -640,12 +642,11 @@ monitorable = false
 script = ExtResource("6_h4aua")
 health = NodePath("../../../HealthComponent")
 character = NodePath("../../..")
-damage_weight = ExtResource("7_vaekp")
+damage_weight = ExtResource("10_4ej45")
 fortitude = 100.0
 metadata/_custom_type_script = "uid://dxi040henumdl"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="OneWeaponManager/Shield/ShieldBlock"]
-position = Vector2(56, -1)
 shape = SubResource("CapsuleShape2D_5wxro")
 
 [node name="PlayerSprite" type="AnimatedSprite2D" parent="."]

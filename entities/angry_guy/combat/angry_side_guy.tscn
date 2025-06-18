@@ -2,14 +2,14 @@
 
 [ext_resource type="Script" uid="uid://cylvf3egj10ls" path="res://entities/angry_guy/combat/angry_side_guy.gd" id="1_s53i8"]
 [ext_resource type="Script" uid="uid://cqiy0c1ux3u11" path="res://utils/components/health_component.gd" id="3_3syi6"]
+[ext_resource type="Resource" uid="uid://tvj4nbmjgmat" path="res://utils/stats/weights/flesh.tres" id="4_qiuip"]
 [ext_resource type="Texture2D" uid="uid://c20ep22mxecly" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Idle.png" id="4_s53i8"]
 [ext_resource type="Script" uid="uid://ddcen4g2pqeue" path="res://utils/combat/combat_components/melee_hitbox.gd" id="5_1eyxk"]
 [ext_resource type="Texture2D" uid="uid://bplnn0xxx31ik" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Jump.png" id="5_4wd4x"]
 [ext_resource type="Script" uid="uid://b01wmptn1yb2f" path="res://utils/components/hurt_box.gd" id="5_mqm4t"]
-[ext_resource type="Resource" uid="uid://0712inn535qv" path="res://utils/stats/weights/flesh_damage.tres" id="6_nelm0"]
 [ext_resource type="Texture2D" uid="uid://cfkxy7dkiwbbb" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Run.png" id="6_p0k87"]
+[ext_resource type="Script" uid="uid://1mtktothypu5" path="res://utils/combat/combat_components/damage_stats.gd" id="6_qiuip"]
 [ext_resource type="Texture2D" uid="uid://734pgl2y80ek" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Attack1.png" id="6_y37jb"]
-[ext_resource type="Script" uid="uid://cdmve1r430ta1" path="res://utils/combat/combat_components/stat_block.gd" id="7_p02h0"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_o3jth"]
 radius = 65.0
@@ -19,11 +19,11 @@ height = 220.0
 radius = 80.0
 height = 226.0
 
-[sub_resource type="Resource" id="Resource_qiuip"]
-script = ExtResource("7_p02h0")
-slice = 5.0
+[sub_resource type="Resource" id="Resource_1eyxk"]
+script = ExtResource("6_qiuip")
+slice = 8.0
 smash = 10.0
-metadata/_custom_type_script = "uid://cdmve1r430ta1"
+metadata/_custom_type_script = "uid://1mtktothypu5"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iup6c"]
 size = Vector2(194.75, 129)
@@ -405,7 +405,8 @@ monitoring = false
 script = ExtResource("5_mqm4t")
 health = NodePath("../HealthComponent")
 character = NodePath("..")
-damage_weight = ExtResource("6_nelm0")
+damage_weight = ExtResource("4_qiuip")
+fortitude = 0.0
 metadata/_custom_type_script = "uid://b01wmptn1yb2f"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
@@ -415,7 +416,7 @@ shape = SubResource("CapsuleShape2D_ch6qh")
 collision_layer = 2
 collision_mask = 4
 script = ExtResource("5_1eyxk")
-max_stats = SubResource("Resource_qiuip")
+max_stats = SubResource("Resource_1eyxk")
 is_active = false
 metadata/_custom_type_script = "uid://ddcen4g2pqeue"
 
