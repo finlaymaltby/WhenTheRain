@@ -51,7 +51,7 @@ func _physics_process(delta: float) -> void:
 func try_hit(hurt: HurtBox) -> void:
 	# aim ray at target
 	ray.position = Vector2.ZERO
-	ray.target_position = hurt.global_position - ray.global_position
+	ray.target_position = global_transform.inverse() * hurt.global_position
 
 	var stats := max_stats.duplicate()
 	ray.enabled = true

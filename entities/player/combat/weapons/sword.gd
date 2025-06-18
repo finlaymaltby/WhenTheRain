@@ -4,8 +4,9 @@ func _ready() -> void:
 	super()
 
 func _cancel() -> void:
-	push_error("override in subclass")
-
+	$SwordSwing.is_active = false
 
 func _unhandled_input(event: InputEvent) -> void:
-	breakpoint
+	if event.is_action_released("attack"):
+		if manager.request_focus(self):
+			run_anim("swing")

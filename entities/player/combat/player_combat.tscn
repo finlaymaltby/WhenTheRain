@@ -242,55 +242,55 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("OneWeaponManager/Sword/SwordSwing:is_active")
+tracks/1/path = NodePath("PlayerSprite:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false]
+"values": [&"idle"]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("PlayerSprite:animation")
+tracks/2/path = NodePath("ShieldSprite:frame")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [&"idle"]
+"values": [0]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("ShieldSprite:frame")
+tracks/3/path = NodePath("ShieldSprite:visible")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [0]
+"values": [false]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("ShieldSprite:visible")
+tracks/4/path = NodePath(".:in_control")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false]
+"values": [true]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("OneWeaponManager/Shield/ShieldBlock:is_active")
+tracks/5/path = NodePath("OneWeaponManager/Sword/SwordSwing:is_active")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
@@ -302,14 +302,38 @@ tracks/5/keys = {
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath(".:in_control")
+tracks/6/path = NodePath("OneWeaponManager/Shield/ShieldBlock:is_active")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [true]
+"values": [false]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("OneWeaponManager/Sword:cancellable")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("OneWeaponManager/Shield:cancellable")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(-0.00178907),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
 }
 
 [sub_resource type="Animation" id="Animation_j3ikf"]
@@ -426,10 +450,22 @@ tracks/5/path = NodePath(".:in_control")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.6),
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, true]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("OneWeaponManager/Shield:cancellable")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
-"values": [true, true, true]
+"values": [false, true, false]
 }
 
 [sub_resource type="Animation" id="Animation_fybyu"]
@@ -443,7 +479,7 @@ tracks/0/path = NodePath("PlayerSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"times": PackedFloat32Array(-0.000390183, 0.1, 0.2, 0.3),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [0, 1, 2, 3]
@@ -483,6 +519,18 @@ tracks/3/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [true, true]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("OneWeaponManager/Sword:cancellable")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
 }
 
 [sub_resource type="Animation" id="Animation_gmba4"]
@@ -544,23 +592,26 @@ metadata/_custom_type_script = "uid://cqiy0c1ux3u11"
 position = Vector2(1, -1)
 shape = SubResource("CapsuleShape2D_ts066")
 
-[node name="PlayerHurtBox" type="Area2D" parent="." node_paths=PackedStringArray("health")]
+[node name="PlayerHurtBox" type="Area2D" parent="." node_paths=PackedStringArray("health", "character")]
 collision_layer = 4
 collision_mask = 0
 script = ExtResource("4_441tw")
 health = NodePath("../HealthComponent")
+character = NodePath("..")
 damage_weight = ExtResource("4_o6yy0")
 metadata/_custom_type_script = "uid://b01wmptn1yb2f"
 
 [node name="PlayerHurtBoxCollision" type="CollisionShape2D" parent="PlayerHurtBox"]
 shape = SubResource("CapsuleShape2D_4uu6h")
 
-[node name="OneWeaponManager" type="Node" parent="."]
+[node name="OneWeaponManager" type="Node2D" parent="."]
 script = ExtResource("3_2yu7q")
 metadata/_custom_type_script = "uid://dimrow4eq0trj"
 
-[node name="Sword" type="Node" parent="OneWeaponManager"]
+[node name="Sword" type="Node2D" parent="OneWeaponManager" node_paths=PackedStringArray("manager", "animation_player")]
 script = ExtResource("6_4ej45")
+manager = NodePath("..")
+animation_player = NodePath("../../AnimationPlayer")
 metadata/_custom_type_script = "uid://ds7nl8eog7r3g"
 
 [node name="SwordSwing" type="Area2D" parent="OneWeaponManager/Sword"]
@@ -575,16 +626,20 @@ metadata/_custom_type_script = "uid://ddcen4g2pqeue"
 position = Vector2(126, -1)
 shape = SubResource("RectangleShape2D_m55uf")
 
-[node name="Shield" type="Node" parent="OneWeaponManager"]
+[node name="Shield" type="Node2D" parent="OneWeaponManager" node_paths=PackedStringArray("manager", "animation_player")]
 script = ExtResource("9_hrtpv")
+manager = NodePath("..")
+animation_player = NodePath("../../AnimationPlayer")
 metadata/_custom_type_script = "uid://ds7nl8eog7r3g"
 
-[node name="ShieldBlock" type="Area2D" parent="OneWeaponManager/Shield"]
+[node name="ShieldBlock" type="Area2D" parent="OneWeaponManager/Shield" node_paths=PackedStringArray("health", "character")]
 collision_layer = 12
 collision_mask = 0
 monitoring = false
 monitorable = false
 script = ExtResource("6_h4aua")
+health = NodePath("../../../HealthComponent")
+character = NodePath("../../..")
 damage_weight = ExtResource("7_vaekp")
 fortitude = 100.0
 metadata/_custom_type_script = "uid://dxi040henumdl"

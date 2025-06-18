@@ -37,7 +37,6 @@ shape = SubResource("WorldBoundaryShape2D_o10rv")
 [node name="SidePlayer" parent="." instance=ExtResource("4_pi853")]
 position = Vector2(1438, 534)
 motion_mode = 0
-jump_speed = 15.0
 
 [node name="AngryGuy" parent="." node_paths=PackedStringArray("balloon", "enemy") instance=ExtResource("5_rmmsv")]
 position = Vector2(554, 569)

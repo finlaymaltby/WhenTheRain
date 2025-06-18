@@ -20,7 +20,7 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 		
-	if $Shield.is_active:
+	if $OneWeaponManager/Shield/ShieldBlock.is_active:
 		move_and_slide()
 		return
 
@@ -36,15 +36,3 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	
-func _input(event: InputEvent) -> void:
-	if not $Shield.is_active and event.is_action_released("attack"):
-		$AnimationPlayer.play("swing")
-		
-	if event.is_action_pressed("defend"):
-		$AnimationPlayer.play("shield")
-		$AnimationPlayer.advance(0.2)
-	
-	if event.is_action_released("defend"):
-		$AnimationPlayer.play_backwards("shield")
-
-	$AnimationPlayer.advance(0)
