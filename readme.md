@@ -1,7 +1,7 @@
 TODO:
 - Action/Ability resource 
     - store range, cooldown etc.
-    - FIX THE SHIELD. Can just be a hurt box
+    - Finish writing sword and shield
 
 - UI
     - Get buttons to use godot native focus + fix hacky pressed focus 'solution'
@@ -11,10 +11,7 @@ TODO:
     - Attach pevent update to a state update signal
     - actually make it
 
-- Combat body changes:
-    - refactor stat system
-
-Damage weights
-- has minimum req to do anything 
-Knock back weights are complement of damage weights
-- has mass
+- Hitbox
+    - Better define hitbox and melee_hitbox
+    
+find . -type f -name '*.gd' -not -path './addons/*' -print0 | xargs -0 cat | wc -l

@@ -1,0 +1,42 @@
+[gd_scene load_steps=8 format=3 uid="uid://dqf7oyfqktpx1"]
+
+[ext_resource type="Script" uid="uid://b4g07qbyff6e6" path="res://utils/combat/combat_body/combat_character.gd" id="1_jsq67"]
+[ext_resource type="Texture2D" uid="uid://hdcq6bl8bqs8" path="res://entities/dummy/evil_guy.png" id="2_r11eo"]
+[ext_resource type="Script" uid="uid://cqiy0c1ux3u11" path="res://utils/components/health_component.gd" id="3_b5kq7"]
+[ext_resource type="Script" uid="uid://b01wmptn1yb2f" path="res://utils/components/hurt_box.gd" id="4_r35us"]
+[ext_resource type="Resource" uid="uid://0712inn535qv" path="res://utils/stats/weights/flesh_damage.tres" id="5_814lu"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_o3jth"]
+radius = 51.0
+height = 138.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ch6qh"]
+radius = 73.0
+height = 168.0
+
+[node name="SideDummy" type="CharacterBody2D"]
+script = ExtResource("1_jsq67")
+
+[node name="EvilGuy" type="Sprite2D" parent="."]
+position = Vector2(2, 4)
+scale = Vector2(2, 2)
+texture = ExtResource("2_r11eo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_o3jth")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_b5kq7")
+max_health = 50.0
+metadata/_custom_type_script = "uid://cqiy0c1ux3u11"
+
+[node name="HurtBox" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("4_r35us")
+damage_weight = ExtResource("5_814lu")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+shape = SubResource("CapsuleShape2D_ch6qh")
+
+[connection signal="health_died" from="HealthComponent" to="." method="_on_health_component_health_died"]

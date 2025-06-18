@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="StatBlock" load_steps=2 format=3 uid="uid://br8wb8ycckdjq"]
+
+[ext_resource type="Script" uid="uid://cdmve1r430ta1" path="res://utils/combat/combat_components/stat_block.gd" id="1_21udr"]
+
+[resource]
+script = ExtResource("1_21udr")
+slice = 0.15
+smash = 0.75
+metadata/_custom_type_script = "uid://cdmve1r430ta1"

@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://ck633mt16j2wm"]
+
+[ext_resource type="Texture2D" uid="uid://hdcq6bl8bqs8" path="res://entities/dummy/evil_guy.png" id="3_s2lvg"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lum8e"]
+radius = 59.0
+height = 142.0
+
+[node name="Dummy" type="CharacterBody2D"]
+
+[node name="EvilGuy" type="Sprite2D" parent="."]
+position = Vector2(6, -68)
+scale = Vector2(2, 2)
+texture = ExtResource("3_s2lvg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -69)
+shape = SubResource("CapsuleShape2D_lum8e")

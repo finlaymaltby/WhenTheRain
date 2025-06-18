@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://btobqjhtrblyk"
+path="res://.godot/imported/demo_fight.dialogue-44b6ba0e65aaf884bd9c005735e2b777.tres"
+
+[deps]
+
+source_file="res://fights/demo_fight/demo_fight.dialogue"
+dest_files=["res://.godot/imported/demo_fight.dialogue-44b6ba0e65aaf884bd9c005735e2b777.tres"]
+
+[params]
+
+defaults=true

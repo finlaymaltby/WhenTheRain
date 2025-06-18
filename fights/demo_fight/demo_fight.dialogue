@@ -1,0 +1,22 @@
+~ start
+Demo Guy: Okay so are you ready
+Demo Guy: I'm gonna teach you how to boogie
+~ explanation
+Demo Guy: First, try swinging your sword
+Demo Guy: Saying mroe things
+Demo Guy: asdfaslkfj als;djfal;skfj adslfkjadl;fajs fl;kjad sfasfafsdf 
+Demo Guy:  Moremore more blah blahb abha
+Demo Guy: asfajf ;alkdfj a;dlsfja;lsdkfjas lk;dfja a;lsdkj adslkfjs 
+=> END
+
+~ _on_approach
+if not is_prepped
+	Demo Guy: Woah woah don't get ahead of yourself there
+	Demo Guy: Anyways what was I saying?
+	=> explanation
+	
+
+~ on_attack
+Demo Guy: Hey what wtf are you doing 
+
+=> END
