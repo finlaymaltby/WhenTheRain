@@ -50,7 +50,6 @@ func _ready() -> void:
 		push_error("air drag not set")
 		
 	if not turned.is_connected(_on_turned):
-		push_warning("signal not connected")
 		turned.connect(_on_turned)
 
 func get_move_dir() -> Vector2:

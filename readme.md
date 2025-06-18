@@ -2,6 +2,7 @@ TODO:
 - Action/Ability resource 
     - store range, cooldown etc.
     - Finish writing sword and shield
+	- Cancel weapon should have to await 
 
 - UI
     - Get buttons to use godot native focus + fix hacky pressed focus 'solution'

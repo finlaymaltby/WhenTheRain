@@ -1,8 +1,11 @@
-[gd_resource type="Resource" script_class="StatBlock" load_steps=2 format=3 uid="uid://dxah4vj7wxcdp"]
+[gd_resource type="Resource" script_class="AttackStats" load_steps=2 format=3 uid="uid://dxah4vj7wxcdp"]
 
-[ext_resource type="Script" uid="uid://cdmve1r430ta1" path="res://utils/combat/combat_components/stat_block.gd" id="1_u4g8q"]
+[ext_resource type="Script" uid="uid://d4f3qxk3hrx0e" path="res://utils/combat/combat_components/attack_stats.gd" id="1_jsum8"]
 
 [resource]
-script = ExtResource("1_u4g8q")
-slice = 10.0
-smash = 2.0
+script = ExtResource("1_jsum8")
+attack_range = 0.0
+prep_time = 0.0
+recovery_time = 0.0
+attack_type = 0
+metadata/_custom_type_script = "uid://d4f3qxk3hrx0e"
