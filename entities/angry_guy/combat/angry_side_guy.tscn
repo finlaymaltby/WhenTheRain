@@ -434,3 +434,5 @@ libraries = {
 &"": SubResource("AnimationLibrary_bmvja")
 }
 autoplay = "attack"
+
+[connection signal="turned" from="." to="." method="_on_turned"]

@@ -127,10 +127,8 @@ class Given extends PEvent:
 class EnemyNear extends StateEvent:
 	var near_dist: float 
 
-	static func from_dist(dist: float) -> EnemyNear:
-		var event := EnemyNear.new()
-		event.near_dist = dist
-		return event
+	func _init(dist: float) -> void:
+		near_dist = dist
 
 	func _is_occurring(state: State) -> bool:
 		return state.get_dist() <= near_dist
@@ -140,11 +138,6 @@ class EnemyAirborne extends StateEvent:
 		return not state.enemy.is_on_floor()
 
 class EnemyAdvances extends StateEvent:
-	func within_dist(dist: float) -> Given:
-		var adv := EnemyAdvances.new()
-		var dst := EnemyNear.from_dist(dist)
-		return dst.given(adv)
-
 	func _is_occurring(state: State) -> bool:
 		return sign(state.position().x - state.enemy_position().x) == sign(state.enemy_velocity().x)
 

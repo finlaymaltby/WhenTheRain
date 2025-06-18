@@ -14,4 +14,4 @@ TODO:
 - Hitbox
     - Better define hitbox and melee_hitbox
     
-find . -type f -name '*.gd' -not -path './addons/*' -print0 | xargs -0 cat | wc -l
+find . -type f -name '*.gd' -not -path './addons/*' -print0 | xargs -0 cat | wc
