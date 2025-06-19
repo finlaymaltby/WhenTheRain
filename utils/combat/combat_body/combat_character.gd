@@ -5,11 +5,13 @@ class_name CombatCharacter extends CombatBody
 var state: PEvent.State 
 
 func _ready() -> void:
-	super._ready()
+	super()
 	
 	if not enemy:
 		push_error("enemy msut be dfined")
 	state = PEvent.State.new(self, enemy)
+
+	health.health_died.connect(_on_health_died)
 
 func _physics_process(delta: float) -> void:
 	var _move_type := process_movement(delta)
@@ -18,5 +20,5 @@ func _physics_process(delta: float) -> void:
 func tie(event: PEvent, on_fire: Callable) -> PEventHandler:
 	return PEventHandler.new(event, on_fire)
 
-func _on_health_component_health_died(dmg_taken: float) -> void:
+func _on_health_died(dmg_taken: float) -> void:
 	queue_free()
