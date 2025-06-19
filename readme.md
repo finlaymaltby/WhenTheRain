@@ -15,4 +15,6 @@ TODO:
 - Hitbox
     - Better define hitbox and melee_hitbox
     
+
+GET RID OFO ALL STATIC FUNC FROM
 find . -type f -name '*.gd' -not -path './addons/*' -print0 | xargs -0 cat | wc

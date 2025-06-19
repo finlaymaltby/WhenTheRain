@@ -9,14 +9,14 @@ func _ready() -> void:
 	
 	if not enemy:
 		push_error("enemy msut be dfined")
-	state = PEvent.State.from(self, enemy)
+	state = PEvent.State.new(self, enemy)
 
 func _physics_process(delta: float) -> void:
 	var _move_type := process_movement(delta)
 	move_and_slide()
 	
 func tie(event: PEvent, on_fire: Callable) -> PEventHandler:
-	return PEventHandler.from(event, on_fire)
+	return PEventHandler.new(event, on_fire)
 
 func _on_health_component_health_died(dmg_taken: float) -> void:
 	queue_free()

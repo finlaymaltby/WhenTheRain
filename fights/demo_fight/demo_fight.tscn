@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://mnh4vgsllx7h"]
+[gd_scene load_steps=10 format=3 uid="uid://mnh4vgsllx7h"]
 
 [ext_resource type="PackedScene" uid="uid://c8rr8smgvfjk4" path="res://ui/dialogue/scenes/default_balloon.tscn" id="1_50oka"]
 [ext_resource type="Script" uid="uid://dk3e3xktli8c3" path="res://ui/dialogue/scripts/auto_balloon.gd" id="2_hjnim"]
 [ext_resource type="Texture2D" uid="uid://cfbf1yppvx5da" path="res://fights/demo_fight/StonySideView.png" id="3_k1oqk"]
 [ext_resource type="PackedScene" uid="uid://dblhihf157xkn" path="res://entities/player/combat/player_combat.tscn" id="4_pi853"]
 [ext_resource type="PackedScene" uid="uid://q8eiedgcs38p" path="res://entities/angry_guy/combat/combat_angry_guy.tscn" id="6_10o0n"]
+[ext_resource type="Resource" uid="uid://btobqjhtrblyk" path="res://fights/demo_fight/demo_fight.dialogue" id="6_kyqyg"]
 [ext_resource type="Script" uid="uid://cebap58cylrqv" path="res://ui/health_display.gd" id="7_l2t7t"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_o10rv"]
@@ -31,8 +32,11 @@ shape = SubResource("WorldBoundaryShape2D_o10rv")
 position = Vector2(1438, 534)
 motion_mode = 0
 
-[node name="AngryGuy" parent="." instance=ExtResource("6_10o0n")]
+[node name="AngryGuy" parent="." node_paths=PackedStringArray("balloon", "enemy") instance=ExtResource("6_10o0n")]
 position = Vector2(258, 325)
+dialogue = ExtResource("6_kyqyg")
+balloon = NodePath("../DefaultBalloon")
+enemy = NodePath("../SidePlayer")
 
 [node name="HealthDisplay" type="Label" parent="." node_paths=PackedStringArray("character")]
 offset_left = 24.0
@@ -43,10 +47,11 @@ label_settings = SubResource("LabelSettings_3fpli")
 script = ExtResource("7_l2t7t")
 character = NodePath("../SidePlayer")
 
-[node name="HealthDisplay2" type="Label" parent="."]
-offset_left = 1242.0
-offset_top = 998.0
-offset_right = 1347.0
-offset_bottom = 1057.0
+[node name="HealthDisplay2" type="Label" parent="." node_paths=PackedStringArray("character")]
+offset_left = 1550.0
+offset_top = 930.0
+offset_right = 1655.0
+offset_bottom = 1026.0
 theme_override_font_sizes/font_size = 70
 script = ExtResource("7_l2t7t")
+character = NodePath("../AngryGuy")

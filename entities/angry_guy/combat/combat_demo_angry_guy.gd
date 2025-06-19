@@ -13,4 +13,5 @@ func _ready() -> void:
 	balloon.start(dialogue, "start", [self])
 
 
-	
+func get_move_dir() -> Vector2:
+	return Vector2.ZERO

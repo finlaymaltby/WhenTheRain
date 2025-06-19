@@ -1,6 +1,6 @@
 [gd_scene load_steps=57 format=3 uid="uid://q8eiedgcs38p"]
 
-[ext_resource type="Script" uid="uid://7np2qtcd1x8v" path="res://entities/angry_guy/combat/combat_angry_guy_demo.gd" id="1_pevri"]
+[ext_resource type="Script" uid="uid://7np2qtcd1x8v" path="res://entities/angry_guy/combat/combat_demo_angry_guy.gd" id="1_pevri"]
 [ext_resource type="Script" uid="uid://cqiy0c1ux3u11" path="res://utils/components/health_component.gd" id="3_3syi6"]
 [ext_resource type="Texture2D" uid="uid://c20ep22mxecly" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Idle.png" id="4_s53i8"]
 [ext_resource type="Script" uid="uid://ddcen4g2pqeue" path="res://utils/combat/combat_components/melee_hitbox.gd" id="5_1eyxk"]
@@ -500,34 +500,6 @@ tracks/1/keys = {
 "values": [0, 1]
 }
 
-[sub_resource type="Animation" id="Animation_fjopo"]
-resource_name = "run"
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("GuySprite:animation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [&"run"]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("GuySprite:frame")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [0, 1, 2, 3, 4, 5, 7]
-}
-
 [sub_resource type="Animation" id="Animation_ik0te"]
 resource_name = "lase_them"
 step = 0.0833333
@@ -568,6 +540,34 @@ tracks/2/keys = {
 "values": [true, false]
 }
 
+[sub_resource type="Animation" id="Animation_fjopo"]
+resource_name = "run"
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("GuySprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"run"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("GuySprite:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 7]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_bmvja"]
 _data = {
 &"RESET": SubResource("Animation_ewsl4"),
@@ -578,13 +578,13 @@ _data = {
 &"run": SubResource("Animation_fjopo")
 }
 
-[node name="AngryGuy" type="CharacterBody2D"]
+[node name="AngryGuy" type="CharacterBody2D" node_paths=PackedStringArray("health")]
 script = ExtResource("1_pevri")
-mass = 2.0
-speed = 100.0
-drag = 10.0
-jump_speed = 100.0
-air_speed = 100.0
+health = NodePath("HealthComponent")
+mass = 1.0
+speed = 3.0
+jump_speed = 4.0
+air_speed = 2.0
 in_control = true
 metadata/_custom_type_script = "uid://q8eun8brjw37"
 
@@ -602,8 +602,9 @@ collision_mask = 0
 monitoring = false
 script = ExtResource("5_mqm4t")
 health = NodePath("../HealthComponent")
-character = NodePath("")
+character = NodePath("..")
 damage_weight = ExtResource("6_nelm0")
+fortitude = 0.0
 metadata/_custom_type_script = "uid://b01wmptn1yb2f"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]

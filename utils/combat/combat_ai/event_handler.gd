@@ -4,16 +4,9 @@ var event_listener: PEvent
 var overrides: Array[PEventHandler]
 var on_fire: Callable
 
-static func from(_listener: PEvent, _on_fire: Callable) -> PEventHandler:
-	var handler := PEventHandler.new()
-	handler.event_listener = _listener
-	handler.on_fire = _on_fire
-	return handler
-
-func update(state: PEvent.State) -> void:
-	event_listener.update(state)
-	for e in overrides:
-		e.update(state)
+func _init(_listener: PEvent, _on_fire: Callable) -> void:
+	event_listener = _listener
+	on_fire = _on_fire
 
 ## checks for firing and calls on_fire
 ## returns whether it or any of its overrides fired
