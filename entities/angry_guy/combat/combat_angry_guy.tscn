@@ -1,6 +1,6 @@
 [gd_scene load_steps=57 format=3 uid="uid://q8eiedgcs38p"]
 
-[ext_resource type="Script" uid="uid://7np2qtcd1x8v" path="res://entities/angry_guy/combat/combat_demo_angry_guy.gd" id="1_pevri"]
+[ext_resource type="Script" uid="uid://7np2qtcd1x8v" path="res://fights/demo_fight/combat_demo_angry_guy.gd" id="1_pevri"]
 [ext_resource type="Script" uid="uid://cqiy0c1ux3u11" path="res://utils/components/health_component.gd" id="3_3syi6"]
 [ext_resource type="Texture2D" uid="uid://c20ep22mxecly" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Idle.png" id="4_s53i8"]
 [ext_resource type="Script" uid="uid://ddcen4g2pqeue" path="res://utils/combat/combat_components/melee_hitbox.gd" id="5_1eyxk"]
@@ -581,7 +581,7 @@ _data = {
 script = ExtResource("1_pevri")
 health = NodePath("HealthComponent")
 mass = 1.0
-speed = 3.0
+speed = 2.0
 jump_speed = 4.0
 air_speed = 2.0
 in_control = true
