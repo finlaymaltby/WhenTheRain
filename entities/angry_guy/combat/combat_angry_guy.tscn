@@ -7,8 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://bplnn0xxx31ik" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Jump.png" id="5_4wd4x"]
 [ext_resource type="Script" uid="uid://b01wmptn1yb2f" path="res://utils/components/hurt_box.gd" id="5_mqm4t"]
 [ext_resource type="Script" uid="uid://dimrow4eq0trj" path="res://utils/combat/combat_components/one_weapon_manager.gd" id="5_pevri"]
-[ext_resource type="Script" uid="uid://ds7nl8eog7r3g" path="res://utils/combat/combat_components/weapon.gd" id="6_cf5gd"]
 [ext_resource type="Resource" uid="uid://tvj4nbmjgmat" path="res://utils/stats/weights/flesh.tres" id="6_nelm0"]
+[ext_resource type="Script" uid="uid://dw51rw361udfq" path="res://utils/combat/combat_components/auto_weapon.gd" id="6_op0k3"]
 [ext_resource type="Texture2D" uid="uid://cfkxy7dkiwbbb" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Run.png" id="6_p0k87"]
 [ext_resource type="Texture2D" uid="uid://734pgl2y80ek" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Attack1.png" id="6_y37jb"]
 [ext_resource type="Script" uid="uid://1mtktothypu5" path="res://utils/combat/combat_components/damage_stats.gd" id="7_p02h0"]
@@ -84,7 +84,7 @@ animations = [{
 [sub_resource type="Resource" id="Resource_pevri"]
 script = ExtResource("7_p02h0")
 slice = 10.0
-smash = 0.0
+smash = 1.0
 metadata/_custom_type_script = "uid://1mtktothypu5"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cf5gd"]
@@ -321,7 +321,7 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("OneWeaponManager/LaserGun/MeleeHitbox:is_active")
+tracks/4/path = NodePath("OneWeaponManager/LaserGun/LaserAttack:is_active")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -381,7 +381,6 @@ tracks/8/keys = {
 
 [sub_resource type="Animation" id="Animation_4wd4x"]
 resource_name = "attack"
-loop_mode = 2
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -530,7 +529,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("OneWeaponManager/LaserGun/MeleeHitbox:is_active")
+tracks/2/path = NodePath("OneWeaponManager/LaserGun/LaserAttack:is_active")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -615,9 +614,10 @@ script = ExtResource("5_pevri")
 metadata/_custom_type_script = "uid://dimrow4eq0trj"
 
 [node name="Sword" type="Node2D" parent="OneWeaponManager" node_paths=PackedStringArray("animation_player")]
-script = ExtResource("6_cf5gd")
+script = ExtResource("6_op0k3")
+anim_name = &"attack"
 animation_player = NodePath("../../AnimationPlayer")
-metadata/_custom_type_script = "uid://ds7nl8eog7r3g"
+metadata/_custom_type_script = "uid://dw51rw361udfq"
 
 [node name="SwordAttack" type="Area2D" parent="OneWeaponManager/Sword"]
 collision_layer = 2
@@ -632,23 +632,28 @@ position = Vector2(180, -2)
 shape = SubResource("RectangleShape2D_iup6c")
 
 [node name="LaserGun" type="Node2D" parent="OneWeaponManager" node_paths=PackedStringArray("animation_player")]
-position = Vector2(242, 0)
-script = ExtResource("6_cf5gd")
+position = Vector2(85, -22)
+script = ExtResource("6_op0k3")
+anim_name = &"lase_them"
 animation_player = NodePath("../../AnimationPlayer")
-metadata/_custom_type_script = "uid://ds7nl8eog7r3g"
+metadata/_custom_type_script = "uid://dw51rw361udfq"
 
 [node name="LaserSprite" type="AnimatedSprite2D" parent="OneWeaponManager/LaserGun"]
 visible = false
+position = Vector2(141, 1)
 scale = Vector2(5, 5)
 sprite_frames = SubResource("SpriteFrames_vehgc")
 
-[node name="MeleeHitbox" type="Area2D" parent="OneWeaponManager/LaserGun"]
+[node name="LaserAttack" type="Area2D" parent="OneWeaponManager/LaserGun"]
+position = Vector2(141, 1)
+collision_layer = 2
+collision_mask = 4
 script = ExtResource("5_1eyxk")
 max_stats = SubResource("Resource_pevri")
 is_active = false
 metadata/_custom_type_script = "uid://ddcen4g2pqeue"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="OneWeaponManager/LaserGun/MeleeHitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="OneWeaponManager/LaserGun/LaserAttack"]
 position = Vector2(10.5, 2.5)
 shape = SubResource("RectangleShape2D_cf5gd")
 

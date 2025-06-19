@@ -33,7 +33,7 @@ position = Vector2(1438, 534)
 motion_mode = 0
 
 [node name="AngryGuy" parent="." node_paths=PackedStringArray("balloon", "enemy") instance=ExtResource("6_10o0n")]
-position = Vector2(258, 325)
+position = Vector2(346, 597)
 dialogue = ExtResource("6_kyqyg")
 balloon = NodePath("../DefaultBalloon")
 enemy = NodePath("../SidePlayer")

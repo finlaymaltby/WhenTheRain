@@ -1,4 +1,5 @@
 class_name Weapon extends Node2D
+## Base class for all weapons you can use in a weapon manager
 
 ## weapon to request focus from
 @export var manager: WeaponManager
@@ -9,7 +10,6 @@ class_name Weapon extends Node2D
 
 ## disable override
 @export var disabled: bool = false
-
 
 func _ready() -> void:
 	if not manager:
@@ -38,6 +38,7 @@ func finish() -> void:
 ## plays the animation, freeing focus when finished
 func run_anim(anim: StringName) -> void:
 	animation_player.play(anim)
+	animation_player.advance(0)
 	await animation_player.animation_finished
 	if manager.has_focus(self):
 		finish()

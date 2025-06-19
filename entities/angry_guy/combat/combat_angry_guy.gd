@@ -19,7 +19,7 @@ func _physics_process(delta: float) -> void:
 	if $OneWeaponManager.current_focus:
 		move_and_slide()
 		return
-	
+
 	match move_type:
 		MoveType.STILL:
 			$AnimationPlayer.play("idle")
@@ -32,5 +32,11 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	
+func swing() -> void:
+	$OneWeaponManager/Sword.run()
+	
+func laser() -> void:
+	$OneWeaponManager/LaserGun.run()
+
 func _on_health_component_health_died(dmg_taken: float) -> void:
 	queue_free()

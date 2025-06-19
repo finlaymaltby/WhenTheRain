@@ -36,7 +36,7 @@ func _ready() -> void:
 	ray.set_collision_mask_value(3,true)
 	ray.set_collision_mask_value(4,true)
 	ray.exclude_parent = true
-	ray.hit_from_inside = false
+	ray.hit_from_inside = true
 	ray.enabled = false
 
 func _physics_process(delta: float) -> void:
@@ -59,6 +59,7 @@ func try_hit(hurt: HurtBox) -> void:
 	while true:
 		ray.force_raycast_update()
 		if not ray.is_colliding():
+			breakpoint
 			push_error("something went wrong here, check ray collision")
 		
 		var obj = ray.get_collider()

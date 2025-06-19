@@ -24,6 +24,5 @@ func focus_available() -> bool:
 
 func release_focus(weapon: Weapon) -> void:
 	if weapon != current_focus:
-		breakpoint
 		push_error("weapon tried to release focus when it didn't have it. (double free)")
 	current_focus = null
