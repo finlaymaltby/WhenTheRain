@@ -1,14 +1,14 @@
 class_name PEvent extends RefCounted
 
 class State extends RefCounted: 
+	signal update
+
 	var body: CombatBody
 	var enemy: CombatBody
 
-	static func from(self_body: CombatBody, enemy_body: CombatBody) -> State:
-		var state := State.new()
-		state.body = self_body
-		state.enemy = enemy_body
-		return state
+	func _init(self_body: CombatBody, enemy_body: CombatBody) -> void:
+		body = self_body
+		enemy = enemy_body
 
 	func position() -> Vector2:
 		return body.global_position
@@ -28,6 +28,11 @@ class State extends RefCounted:
 	func is_valid() -> bool:
 		return body and enemy
 
+func _init(_state: State) -> void:
+	_state.update.connect(update)
+
+## Reference to state to update with
+var state: State
 
 ## Did the event fire (off to on) in the most recently processed update.
 ## A conditioned event only fires if its signalling event is the one that fired.
@@ -36,55 +41,54 @@ var fired: bool
 
 ## Call before accessing variables (e.g. occured and just_occured) on the current frame.
 ## Should only be updated ONCE per frame
-func update(state: State) -> void:
+func update() -> void:
 	push_error("must be overriden in subclass")
 
 ## Class for events governed by a state that flips on and off.
 ## fires when off to on
 class StateEvent extends PEvent:
 	## Did the event occur, hold true in the most recently processed update
-	var occured: bool
+	var occurred: bool
 
 	## Did occured fire (off to on) in the most recently processed update
 	## Use if you want to know the event occured and hasn't been processed yet.
 	## Otherwise see triggered
-	var just_occured: bool
+	var just_occurred: bool
 
-	func update(state: State) -> void:
-		var prev: bool = occured
-		occured = _is_occurring(state)
-		if not prev and occured:
-			just_occured = true
+	func update() -> void:
+		var prev: bool = occurred
+		occurred = _is_occurring()
+		if not prev and occurred:
+			just_occurred = true
 		else:
-			just_occured = false
+			just_occurred = false
 		
-		if occured:
-			fired = _decide_fired(state)
+		if occurred:
+			fired = _decide_fired()
 		else:
 			fired = false
 
 	## Is the event occuring in the given state.
 	## Must be overrided in subclass
-	func _is_occurring(state: State) -> bool:
-		breakpoint
+	func _is_occurring() -> bool:
 		push_error("override in subclass")
 		return false
 
 	## Decide whether the event is 'firing' in the given state.
 	## Called at the end of update, so occured and just_occured are valid.
 	## Default is fired = just_occured, override if subclass is picky
-	func _decide_fired(state: State) -> bool:
-		return just_occured
+	func _decide_fired() -> bool:
+		return just_occurred
 
 ## class for events that remember outside signals
 class SignalEvent extends PEvent:
 	## Stores when the signal fires. Is reset every frame
 	var signal_fired_last: bool
 
-	func _init(state: State) -> void:
+	func _init(_state: State) -> void:
 		push_error("override and connect signal to _on_signal")
 
-	func update(state: State) -> void:
+	func update() -> void:
 		fired = signal_fired_last
 		signal_fired_last = false
 
@@ -93,14 +97,14 @@ class SignalEvent extends PEvent:
 
 ## Always occuring, use for root
 class Always extends PEvent:
-	func update(state: State) -> void:
+	func update() -> void:
 		fired = true
 
 func given(condition: StateEvent) -> Given:
-	return Given.from(self, [condition])
+	return Given.new(self, [condition])
 
 func givens(conditions: Array[StateEvent]) -> Given:
-	return Given.from(self, conditions)
+	return Given.new(self, conditions)
 	
 ## Class to handle signals equipped with extra conditions.
 ## Only occurs is all conditions are met.
@@ -111,18 +115,13 @@ class Given extends PEvent:
 	## the additional conditions required to occur
 	var _conditions: Array[StateEvent]
 	
-	static func from(main_event: PEvent, conditions: Array[StateEvent]) -> Given:
-		var event := Given.new()
-		event._main = main_event
-		event._conditions = conditions
-		return event
+	func _init(main_event: PEvent, conditions: Array[StateEvent]) -> void:
+		_main = main_event
+		_conditions = conditions
+		main_event.state.update.connect(update)
 		
-	func update(state: State) -> void:
-		_main.update(state)
-		for condition in _conditions:
-			condition.update(state)
-		
-		fired = _main.fired and _conditions.all(func(c): return c._is_occurring(state))
+	func update() -> void:
+		fired = _main.fired and _conditions.all(func(c): return c.occurred)
 
 class EnemyNear extends StateEvent:
 	var near_dist: float 
@@ -130,27 +129,29 @@ class EnemyNear extends StateEvent:
 	func _init(dist: float) -> void:
 		near_dist = dist
 
-	func _is_occurring(state: State) -> bool:
+	func _is_occurring() -> bool:
 		return state.get_dist() <= near_dist
 		
 class EnemyAirborne extends StateEvent:
-	func _is_occurring(state: State) -> bool:
+	func _is_occurring() -> bool:
 		return not state.enemy.is_on_floor()
 
 class EnemyAdvances extends StateEvent:
-	func _is_occurring(state: State) -> bool:
+	func _is_occurring() -> bool:
 		return sign(state.position().x - state.enemy_position().x) == sign(state.enemy_velocity().x)
 
 class EnemyRetreats extends StateEvent:
-	func _is_occurring(state: State) -> bool:
+	func _is_occurring() -> bool:
 		return sign(state.position().x - state.enemy_position().x) == -sign(state.enemy_velocity().x)
 
 class HealthDied extends SignalEvent:
-	func _init(state: State) -> void:
+	func _init(_state: State) -> void:
+		state = _state
 		state.body.health.health_died.connect(_on_signal)
 
 class Damaged extends SignalEvent:
-	func _init(state: State) -> void:
+	func _init(_state: State) -> void:
+		state = _state
 		state.body.health.health_changed.connect(_on_health_change)
 	
 	func _on_health_change(change: float) -> void:
@@ -158,7 +159,8 @@ class Damaged extends SignalEvent:
 			signal_fired_last = true
 
 class Healed extends SignalEvent:
-	func _init(state: State) -> void:
+	func _init(_state: State) -> void:
+		state = _state
 		state.body.health.health_changed.connect(_on_health_change)
 	
 	func _on_health_change(change: float) -> void:
@@ -166,7 +168,8 @@ class Healed extends SignalEvent:
 			signal_fired_last = true
 
 class EnemyDamaged extends SignalEvent:
-	func _init(state: State) -> void:
+	func _init(_state: State) -> void:
+		state = _state
 		state.body.health.health_changed.connect(_on_health_change)
 	
 	func _on_health_change(change: float) -> void:
@@ -174,7 +177,8 @@ class EnemyDamaged extends SignalEvent:
 			signal_fired_last = true
 
 class EnemyHealed extends SignalEvent:
-	func _init(state: State) -> void:
+	func _init(_state: State) -> void:
+		state = _state
 		state.body.health.health_changed.connect(_on_health_change)
 	
 	func _on_health_change(change: float) -> void:
@@ -182,5 +186,6 @@ class EnemyHealed extends SignalEvent:
 			signal_fired_last = true
 
 class EnemyDied extends SignalEvent:
-	func _init(state: State) -> void:
+	func _init(_state: State) -> void:
+		state = _state
 		state.enemy.died.connect(_on_signal)

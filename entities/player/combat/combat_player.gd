@@ -16,13 +16,9 @@ func get_move_dir() -> Vector2:
 func _physics_process(delta: float) -> void:
 	var move_type := process_movement(delta)
 	
-	if $AnimationPlayer.current_animation in ["swing", "shield"]:
+	if $OneWeaponManager.current_focus:
 		move_and_slide()
-		return
-		
-	if $OneWeaponManager/Shield/ShieldBlock.is_active:
-		move_and_slide()
-		return
+		return 
 
 	match move_type:
 		MoveType.STILL:

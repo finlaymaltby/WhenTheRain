@@ -1,0 +1,16 @@
+extends CombatAngryGuy
+
+@export var dialogue: DialogueResource
+@export var balloon: DialogueBalloon
+
+func _ready() -> void:
+	super()
+	if not balloon:
+		push_error("my balloon :(")
+	if not dialogue: 
+		push_error("my dialouge :(")
+		
+	balloon.start(dialogue, "start", [self])
+
+
+	

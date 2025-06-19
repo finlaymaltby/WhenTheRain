@@ -1,15 +1,18 @@
-[gd_scene load_steps=44 format=3 uid="uid://q8eiedgcs38p"]
+[gd_scene load_steps=57 format=3 uid="uid://q8eiedgcs38p"]
 
-[ext_resource type="Script" uid="uid://cylvf3egj10ls" path="res://entities/angry_guy/combat/angry_side_guy.gd" id="1_s53i8"]
+[ext_resource type="Script" uid="uid://7np2qtcd1x8v" path="res://entities/angry_guy/combat/combat_angry_guy_demo.gd" id="1_pevri"]
 [ext_resource type="Script" uid="uid://cqiy0c1ux3u11" path="res://utils/components/health_component.gd" id="3_3syi6"]
 [ext_resource type="Texture2D" uid="uid://c20ep22mxecly" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Idle.png" id="4_s53i8"]
 [ext_resource type="Script" uid="uid://ddcen4g2pqeue" path="res://utils/combat/combat_components/melee_hitbox.gd" id="5_1eyxk"]
 [ext_resource type="Texture2D" uid="uid://bplnn0xxx31ik" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Jump.png" id="5_4wd4x"]
 [ext_resource type="Script" uid="uid://b01wmptn1yb2f" path="res://utils/components/hurt_box.gd" id="5_mqm4t"]
-[ext_resource type="Resource" uid="uid://0712inn535qv" path="res://utils/stats/weights/flesh_damage.tres" id="6_nelm0"]
+[ext_resource type="Script" uid="uid://dimrow4eq0trj" path="res://utils/combat/combat_components/one_weapon_manager.gd" id="5_pevri"]
+[ext_resource type="Script" uid="uid://ds7nl8eog7r3g" path="res://utils/combat/combat_components/weapon.gd" id="6_cf5gd"]
+[ext_resource type="Resource" uid="uid://tvj4nbmjgmat" path="res://utils/stats/weights/flesh.tres" id="6_nelm0"]
 [ext_resource type="Texture2D" uid="uid://cfkxy7dkiwbbb" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Run.png" id="6_p0k87"]
 [ext_resource type="Texture2D" uid="uid://734pgl2y80ek" path="res://entities/angry_guy/Medieval King Sprites/Sprites/Attack1.png" id="6_y37jb"]
-[ext_resource type="Script" uid="uid://cdmve1r430ta1" path="res://utils/combat/combat_components/stat_block.gd" id="7_p02h0"]
+[ext_resource type="Script" uid="uid://1mtktothypu5" path="res://utils/combat/combat_components/damage_stats.gd" id="7_p02h0"]
+[ext_resource type="Texture2D" uid="uid://c6l55uotgvvmi" path="res://entities/angry_guy/laser_gun.png" id="9_op0k3"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_o3jth"]
 radius = 65.0
@@ -27,6 +30,65 @@ metadata/_custom_type_script = "uid://cdmve1r430ta1"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iup6c"]
 size = Vector2(194.75, 129)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pevri"]
+atlas = ExtResource("9_op0k3")
+region = Rect2(0, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cf5gd"]
+atlas = ExtResource("9_op0k3")
+region = Rect2(64, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_op0k3"]
+atlas = ExtResource("9_op0k3")
+region = Rect2(128, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n13yv"]
+atlas = ExtResource("9_op0k3")
+region = Rect2(192, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_58o3c"]
+atlas = ExtResource("9_op0k3")
+region = Rect2(256, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_54wqg"]
+atlas = ExtResource("9_op0k3")
+region = Rect2(320, 0, 64, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_vehgc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pevri")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cf5gd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_op0k3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n13yv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_58o3c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_54wqg")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="Resource" id="Resource_pevri"]
+script = ExtResource("7_p02h0")
+slice = 10.0
+smash = 0.0
+metadata/_custom_type_script = "uid://1mtktothypu5"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cf5gd"]
+size = Vector2(301, 5)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_exb02"]
 atlas = ExtResource("6_y37jb")
@@ -211,7 +273,7 @@ step = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("AnimatedSprite2D:frame")
+tracks/0/path = NodePath("GuySprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -223,7 +285,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("AnimatedSprite2D:animation")
+tracks/1/path = NodePath("GuySprite:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -235,7 +297,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("SwordAttack:is_active")
+tracks/2/path = NodePath("OneWeaponManager/Sword/SwordAttack:is_active")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -244,15 +306,87 @@ tracks/2/keys = {
 "update": 1,
 "values": [false]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("OneWeaponManager/LaserGun/LaserSprite:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("OneWeaponManager/LaserGun/MeleeHitbox:is_active")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("OneWeaponManager/Sword:cancellable")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("OneWeaponManager/LaserGun/LaserSprite:frame")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("OneWeaponManager/LaserGun:cancellable")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath(".:in_control")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="Animation" id="Animation_4wd4x"]
 resource_name = "attack"
-loop_mode = 1
+loop_mode = 2
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/path = NodePath("GuySprite:animation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -264,7 +398,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/path = NodePath("GuySprite:frame")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -276,7 +410,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("SwordAttack:is_active")
+tracks/2/path = NodePath("OneWeaponManager/Sword/SwordAttack:is_active")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -285,6 +419,30 @@ tracks/2/keys = {
 "update": 1,
 "values": [false, true, false]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("OneWeaponManager/Sword:cancellable")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("OneWeaponManager/LaserGun:cancellable")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
 
 [sub_resource type="Animation" id="Animation_s53i8"]
 resource_name = "idle"
@@ -292,7 +450,7 @@ step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/path = NodePath("GuySprite:animation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -304,7 +462,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/path = NodePath("GuySprite:frame")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -320,7 +478,7 @@ step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/path = NodePath("GuySprite:animation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -332,7 +490,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/path = NodePath("GuySprite:frame")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -348,7 +506,7 @@ step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/path = NodePath("GuySprite:animation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -360,7 +518,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/path = NodePath("GuySprite:frame")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -370,25 +528,65 @@ tracks/1/keys = {
 "values": [0, 1, 2, 3, 4, 5, 7]
 }
 
+[sub_resource type="Animation" id="Animation_ik0te"]
+resource_name = "lase_them"
+step = 0.0833333
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("OneWeaponManager/LaserGun/LaserSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0833333, 0.166667, 0.25, 0.333333, 0.416667),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0, 1, 2, 3, 4, 5]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("OneWeaponManager/LaserGun/LaserSprite:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [true, false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("OneWeaponManager/LaserGun/MeleeHitbox:is_active")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_bmvja"]
 _data = {
 &"RESET": SubResource("Animation_ewsl4"),
 &"attack": SubResource("Animation_4wd4x"),
 &"idle": SubResource("Animation_s53i8"),
 &"jump": SubResource("Animation_p0k87"),
+&"lase_them": SubResource("Animation_ik0te"),
 &"run": SubResource("Animation_fjopo")
 }
 
-[node name="AngryGuy" type="CharacterBody2D" node_paths=PackedStringArray("health")]
-script = ExtResource("1_s53i8")
-health = NodePath("HealthComponent")
+[node name="AngryGuy" type="CharacterBody2D"]
+script = ExtResource("1_pevri")
 mass = 2.0
 speed = 100.0
 drag = 10.0
 jump_speed = 100.0
 air_speed = 100.0
 in_control = true
-metadata/_custom_type_script = "uid://b4g07qbyff6e6"
+metadata/_custom_type_script = "uid://q8eun8brjw37"
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("3_3syi6")
@@ -404,14 +602,23 @@ collision_mask = 0
 monitoring = false
 script = ExtResource("5_mqm4t")
 health = NodePath("../HealthComponent")
-character = NodePath("..")
+character = NodePath("")
 damage_weight = ExtResource("6_nelm0")
 metadata/_custom_type_script = "uid://b01wmptn1yb2f"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
 shape = SubResource("CapsuleShape2D_ch6qh")
 
-[node name="SwordAttack" type="Area2D" parent="."]
+[node name="OneWeaponManager" type="Node2D" parent="."]
+script = ExtResource("5_pevri")
+metadata/_custom_type_script = "uid://dimrow4eq0trj"
+
+[node name="Sword" type="Node2D" parent="OneWeaponManager" node_paths=PackedStringArray("animation_player")]
+script = ExtResource("6_cf5gd")
+animation_player = NodePath("../../AnimationPlayer")
+metadata/_custom_type_script = "uid://ds7nl8eog7r3g"
+
+[node name="SwordAttack" type="Area2D" parent="OneWeaponManager/Sword"]
 collision_layer = 2
 collision_mask = 4
 script = ExtResource("5_1eyxk")
@@ -419,11 +626,32 @@ max_stats = SubResource("Resource_qiuip")
 is_active = false
 metadata/_custom_type_script = "uid://ddcen4g2pqeue"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="SwordAttack"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="OneWeaponManager/Sword/SwordAttack"]
 position = Vector2(180, -2)
 shape = SubResource("RectangleShape2D_iup6c")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="LaserGun" type="Node2D" parent="OneWeaponManager" node_paths=PackedStringArray("animation_player")]
+position = Vector2(242, 0)
+script = ExtResource("6_cf5gd")
+animation_player = NodePath("../../AnimationPlayer")
+metadata/_custom_type_script = "uid://ds7nl8eog7r3g"
+
+[node name="LaserSprite" type="AnimatedSprite2D" parent="OneWeaponManager/LaserGun"]
+visible = false
+scale = Vector2(5, 5)
+sprite_frames = SubResource("SpriteFrames_vehgc")
+
+[node name="MeleeHitbox" type="Area2D" parent="OneWeaponManager/LaserGun"]
+script = ExtResource("5_1eyxk")
+max_stats = SubResource("Resource_pevri")
+is_active = false
+metadata/_custom_type_script = "uid://ddcen4g2pqeue"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="OneWeaponManager/LaserGun/MeleeHitbox"]
+position = Vector2(10.5, 2.5)
+shape = SubResource("RectangleShape2D_cf5gd")
+
+[node name="GuySprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(-6, -96)
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_cgt3q")
@@ -433,4 +661,4 @@ animation = &"idle"
 libraries = {
 &"": SubResource("AnimationLibrary_bmvja")
 }
-autoplay = "attack"
+autoplay = "RESET"
