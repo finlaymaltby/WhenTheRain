@@ -1,4 +1,4 @@
-class_name DialogueBalloon extends CanvasLayer
+class_name DialogueBalloon extends Control
 ## Base class for all dialogue balloons
 
 signal finished
@@ -34,9 +34,6 @@ var mutation_cooldown: Timer = Timer.new()
 
 ## timer for dialogue waiting in between lines
 var line_wait: Timer = Timer.new()
-
-## The base balloon anchor
-@onready var balloon: Control = %Balloon
 	
 ## The label showing the name of the currently speaking character
 @onready var character_label: RichTextLabel = %CharacterLabel

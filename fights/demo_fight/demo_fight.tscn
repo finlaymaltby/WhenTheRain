@@ -1,7 +1,6 @@
-[gd_scene load_steps=10 format=3 uid="uid://mnh4vgsllx7h"]
+[gd_scene load_steps=9 format=3 uid="uid://mnh4vgsllx7h"]
 
-[ext_resource type="PackedScene" uid="uid://c8rr8smgvfjk4" path="res://ui/dialogue/scenes/default_balloon.tscn" id="1_50oka"]
-[ext_resource type="Script" uid="uid://dk3e3xktli8c3" path="res://ui/dialogue/scripts/auto_balloon.gd" id="2_hjnim"]
+[ext_resource type="PackedScene" uid="uid://bnp6wfs0hn3by" path="res://ui/dialogue/scenes/auto_balloon.tscn" id="1_10o0n"]
 [ext_resource type="Texture2D" uid="uid://cfbf1yppvx5da" path="res://fights/demo_fight/StonySideView.png" id="3_k1oqk"]
 [ext_resource type="PackedScene" uid="uid://dblhihf157xkn" path="res://entities/player/combat/player_combat.tscn" id="4_pi853"]
 [ext_resource type="PackedScene" uid="uid://q8eiedgcs38p" path="res://entities/angry_guy/combat/combat_angry_guy.tscn" id="6_10o0n"]
@@ -15,8 +14,9 @@ font_size = 32
 
 [node name="SideOn" type="Node2D"]
 
-[node name="DefaultBalloon" parent="." instance=ExtResource("1_50oka")]
-script = ExtResource("2_hjnim")
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Balloon" parent="CanvasLayer" instance=ExtResource("1_10o0n")]
 
 [node name="StonySideView" type="Sprite2D" parent="."]
 texture = ExtResource("3_k1oqk")
@@ -35,7 +35,7 @@ motion_mode = 0
 [node name="AngryGuy" parent="." node_paths=PackedStringArray("balloon", "enemy") instance=ExtResource("6_10o0n")]
 position = Vector2(346, 597)
 dialogue = ExtResource("6_kyqyg")
-balloon = NodePath("../DefaultBalloon")
+balloon = NodePath("../CanvasLayer/Balloon")
 enemy = NodePath("../SidePlayer")
 
 [node name="HealthDisplay" type="Label" parent="." node_paths=PackedStringArray("character")]
