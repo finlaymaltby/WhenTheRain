@@ -3,6 +3,12 @@ Demo Guy: Okay so are you ready
 Demo Guy: I'm gonna teach you how to boogie
 ~ explanation
 Demo Guy: First, try swinging your sword
+Demo Guy: then open your shield
+Demo Guy: then do this
+Demo Guy: then do that
+Demo Guy: I can really [wait=5] take my time with my words
+~ check
+set is_prepped = true
 Demo Guy: Saying mroe things. Question yes or no
 - yes
 	Demo Guy:  you said yes
@@ -11,14 +17,22 @@ Demo Guy: Saying mroe things. Question yes or no
 
 => start
 
-~ _on_approach
+=> END
+
+~ on_approach
 if not is_prepped
 	Demo Guy: Woah woah don't get ahead of yourself there
-	Demo Guy: Anyways what was I saying?
-	=> explanation
+	Demo Guy: Go back!!
+	if DUtils.wait_for(enemy_leaves, &"firing", 5.0)
+		Demo Guy: Okay, great. As I was saying
+		=> explanation
+	else
+		Demo Guy: um so nevermind i guess?
+		=> END!
+else
+	=> check
 	
 
 ~ on_attack
 Demo Guy: Hey what wtf are you doing 
 
-=> END

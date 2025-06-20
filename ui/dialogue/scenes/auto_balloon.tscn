@@ -68,7 +68,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 2
 text = "asdlfjadsflasjf alskdfj
 asdf"
-skip_action = &"cancel"
 seconds_per_step = 0.03
 
 [node name="ResponseMenu" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer" node_paths=PackedStringArray("button_template")]

@@ -3,11 +3,11 @@ class_name AttackStats extends Resource
 ## the damage the attack will do 
 @export var damage: DamageStats
 
-## how many pixels you would have to be away 
+## how many pixels you would have to be away to not get hit
 @export var attack_range: float
 
 ## how long it takes until the attack is live from rest
-@export var prep_time: float
+@export var prep_time: float 
 
 ## how long it takes to return to rest after live
 @export var recovery_time: float

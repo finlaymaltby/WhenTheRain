@@ -1,11 +1,7 @@
 class_name CombatAngryGuy extends CombatCharacter
 
-const DIST_V_CLOSE := 300
-const DIST_CLOSE := 480
-
-
-## angy guy expecting you to attack?
-@onready var is_prepped := false
+const DIST_V_CLOSE := 320
+const DIST_CLOSE := 500
 
 func _ready() -> void:
 	super()

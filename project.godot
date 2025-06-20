@@ -16,9 +16,9 @@ config/features=PackedStringArray("4.4", "Forward Plus")
 
 [autoload]
 
-Global="*res://utils/autoloads/global.gd"
 GlobalStory="*res://utils/autoloads/global_story.gd"
 DialogueManager="*res://addons/dialogue_manager/dialogue_manager.gd"
+DUtils="*res://utils/autoloads/dialogue_utils.gd"
 
 [debug]
 
