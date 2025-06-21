@@ -1,8 +1,5 @@
 extends CombatCharacter
 
-@export var dialogue: DialogueResource
-@export var balloon: DialogueBalloon
-
 func _ready() -> void:
 	super()
 	if not balloon:

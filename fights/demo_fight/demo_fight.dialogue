@@ -1,5 +1,6 @@
 ~ start
-Demo Guy: Okay so are you ready
+Demo Guy: Okay so are you readz
+do set_jump_when(enemy_very_close, "on_approach")
 Demo Guy: I'm gonna teach you how to boogie
 ~ explanation
 Demo Guy: First, try swinging your sword
@@ -17,14 +18,14 @@ Demo Guy: Saying mroe things. Question yes or no
 
 => start
 
-=> END
-
 ~ on_approach
+do unset_jump_when(enemy_very_close, "on_approach")
 if not is_prepped
 	Demo Guy: Woah woah don't get ahead of yourself there
 	Demo Guy: Go back!!
-	if DUtils.wait_for(enemy_leaves, &"firing", 5.0)
+	if when_or_wait(enemy_leaves, 5.0)
 		Demo Guy: Okay, great. As I was saying
+		do set_jump_when(enemy_very_close, "on_approach")
 		=> explanation
 	else
 		Demo Guy: um so nevermind i guess?
@@ -34,5 +35,7 @@ else
 	
 
 ~ on_attack
-Demo Guy: Hey what wtf are you doing 
+if not prepped
+	Demo Guy: Hey what wtf are you doing 
+	
 

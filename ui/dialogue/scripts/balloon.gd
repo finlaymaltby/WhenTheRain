@@ -34,6 +34,9 @@ var mutation_cooldown: Timer = Timer.new()
 
 ## timer for dialogue waiting in between lines
 var line_wait: Timer = Timer.new()
+
+## idk :(
+var curr_title: String = ""
 	
 ## The label showing the name of the currently speaking character
 @onready var character_label: RichTextLabel = %CharacterLabel
@@ -96,8 +99,9 @@ func apply_dialogue_line() -> void:
 func when_waiting() -> void:
 	is_waiting = true
 
-## Go to the set_next line
-func set_next(next_id: String) -> void:
+
+## Advances to the given dialogue line, can be overrided with line_override
+func advance_to_next(next_id: String) -> void:
 	if line_override:
 		next_id = line_override
 		line_override = ""
@@ -109,6 +113,7 @@ func next() -> void:
 	if line_override:
 		next_id = line_override
 		line_override = ""
+
 	self.dialogue_line = await dialogue.get_next_dialogue_line(next_id, temporary_game_states)
 
 ## Call to skip the readout
@@ -161,4 +166,4 @@ func _on_mutated(mutation: Dictionary) -> void:
 	is_waiting = false
 
 func _on_responses_menu_response_selected(response: DialogueResponse) -> void:
-	set_next(response.next_id)
+	advance_to_next(response.next_id)

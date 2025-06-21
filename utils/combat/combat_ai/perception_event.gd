@@ -1,6 +1,6 @@
 class_name PEvent extends RefCounted
 
-signal firing
+signal firing(event: PEvent)
 
 class State extends RefCounted: 
 	signal update
@@ -47,7 +47,7 @@ var fired: bool
 func update() -> void:
 	_update()
 	if fired:
-		firing.emit()
+		firing.emit(self)
 
 ## override in subclass
 func _update() -> void:

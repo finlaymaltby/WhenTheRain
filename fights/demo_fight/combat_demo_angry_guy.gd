@@ -1,13 +1,12 @@
 extends CombatAngryGuy
 
-@export var dialogue: DialogueResource
-@export var balloon: DialogueBalloon
-
 ## angy guy expecting you to attack?
 @onready var is_prepped := false
 
-var enemy_close : PEvent
-var enemy_leaves : PEvent
+
+var enemy_very_close: PEvent
+var enemy_close: PEvent
+var enemy_leaves: PEvent
 
 
 func _ready() -> void:
@@ -17,11 +16,10 @@ func _ready() -> void:
 	if not dialogue: 
 		push_error("my dialouge :(")
 
-
+	enemy_very_close = PEvent.EnemyNear.new(state, DIST_V_CLOSE)
 	enemy_close = PEvent.EnemyNear.new(state, DIST_CLOSE)
 	enemy_leaves = PEvent.EnemyNotNear.new(state, DIST_CLOSE)
 
-	enemy_close.firing.connect(do)
 	balloon.start(dialogue, "start", [self])
 	
 	get_tree().create_timer(2).timeout.connect(swing)
@@ -29,7 +27,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	state.update.emit()
 
-func do():
+func do(event):
 	balloon.jump_checked("on_approach", dialogue)
 
 

@@ -1,8 +1,17 @@
 class_name CombatCharacter extends CombatBody
 
+## The enemy for fight targeting
 @export var enemy: CombatBody
 
+## the dialogue reading out
+@export var dialogue: DialogueResource
+
+## balloon to display dialogue to
+@export var balloon: DialogueBalloon
+
 var state: PEvent.State 
+
+var _jump_titles: Dictionary[PEvent, String]
 
 func _ready() -> void:
 	super()
@@ -22,3 +31,19 @@ func tie(event: PEvent, on_fire: Callable) -> PEventHandler:
 
 func _on_health_died(dmg_taken: float) -> void:
 	queue_free()
+
+func handle_jump(event: PEvent) -> void:
+	if not event.fired:
+		push_error("firing func was called when event didn't fire??")
+	
+	balloon.jump_checked(_jump_titles[event], dialogue)
+
+func set_jump_when(event: PEvent, title: String) -> void:
+	if not event.firing.is_connected(handle_jump):
+		event.firing.connect(handle_jump)
+	
+	_jump_titles[event] = title
+
+func unset_jump_when(event: PEvent, title: String) -> void:
+	event.firing.disconnect(handle_jump)
+	_jump_titles[event] = ""

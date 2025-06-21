@@ -1,7 +1,7 @@
 class_name CombatAngryGuy extends CombatCharacter
 
-const DIST_V_CLOSE := 320
-const DIST_CLOSE := 500
+const DIST_V_CLOSE := 300
+const DIST_CLOSE := 400
 
 func _ready() -> void:
 	super()
