@@ -1,0 +1,23 @@
+# this is a comment
+import GlobalStory # import a global script
+import using OtherGlobal # import * from OtherGlobal
+require db as DialogueBalloon # requires a DialogueBalloon to be passed in, referred to as 'db'
+require using CharacterName.ParticularState # requires a characterName and adds all methods and properties to the namespace
+    
+==  HEADING_FIRST == # declares a heading (big deal)
+? player_near => jump_to_this_label # whenever the signal occurs, jump to the label
+? db.dialogue_interrupted => jump_to_another_label 
+
+* bob  # an asterix followed by a name sets the current speaker
+
+This line can be anything, and will be read out
+This line will follow the one above it
+More lines isn't this so great
+I'm asking a question now.
+- first response I'm saying this
+	=> make_this_jump
+- but what if i said this
+	=>< blahbal
+- or this instead
+	* name of new person speaking
+	~ label_name # this is a label name that can be jumped to:

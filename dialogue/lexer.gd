@@ -1,167 +1,327 @@
 class_name Lexer extends RefCounted
-## Lexer that takes a text as a string and returns a list of tokens
+## DialogueScript lexer. 
+## Not a conventional lexer because it treats each line as 'token',
+## which is possible because there is no recursion within each line
 
-class Token extends RefCounted:
-	var type: TokenType
+class Line extends RefCounted:
+	var type: LineType
 	var val: Variant
+	var line_num: int
+	var indent: int 
 
-	func _init(_type, _val = null) -> void:
+	func _init(_type: LineType, _val: Variant, _line_num: int, _indent: int = -2) -> void:
 		type = _type
 		val = _val
+		line_num = _line_num
+		indent = _indent
 
-enum TokenType {
-	IDENT,
-	STRING,
-	NEWLINE,
+	func _to_string() -> String:
+		var string := "%3d: @" % line_num + "%d " % indent
+		match type:
+			LineType.IMPORT:
+				string += "IMPORT ||" + str(val) + "||"
+			LineType.IMPORT_USING:
+				string += "IMPORT USING ||" + str(val) + "||"
+			LineType.REQUIRE:
+				string += "REQUIRE |" + str(val[0]) + "| AS ||" + str(val[1]) + "||"
+			LineType.REQUIRE_USING:
+				string += "REQUIRE USING ||" + str(val) + "||"
+			LineType.HEADING:
+				string += "HEADING |" + str(val) + "|"
+			LineType.LABEL:
+				string += "LABEL |" + str(val) + "|"
+			LineType.CHARACTER:
+				string += 'CHARACTER "' + val + '"'
+			LineType.JUMP:
+				string += "JUMP |" + str(val) + "|"
+			LineType.JUMP_RET:
+				string += "JUMP RET |" + str(val) + "|"
+			LineType.SIGNAL_JUMP:
+				string += "WHEN ||" + str(val[0]) + "|| JUMP |" + str(val[1]) + "|"
+			LineType.LINE:
+				string += 'LINE "' + val + '"'
+			LineType.RESPONSE:
+				string += 'RESPONSE "' + val + '"'
 
-	# imports
+		return string
+
+enum LineType {
 	IMPORT,
-	USING,
+	IMPORT_USING,
+	REQUIRE,
+	REQUIRE_USING,
 
-	# symbols
-	ASTERIX,
-	BRACKET_LEFT,
-	BRACKET_RIGHT,
-	EQUALS,
-	HYPHEN,
-	PERIOD,
-	TILDE,
-
-	# symbol combinations
-	JUMP, 
+	HEADING,
+	LABEL,
+	CHARACTER,
+	
+	JUMP,
 	JUMP_RET,
+	SIGNAL_JUMP,
+
+	LINE,
+	RESPONSE
 }
 
-## the array of tokens that can be outputted
-var tokens: Array[Token]
-var _text: String
-var _lines: PackedStringArray
+## Array of outputted tokenised lines
+var tokens: Array[Line]
+## Input text
+var text: String
+## Lines of text.
+var lines: PackedStringArray
 
-func _init(text: String) -> void:
-	_text = text
-	_lines = text.split("\n")
+## The current line number.
+var curr_line_num: int
+## The line currently being processed
+var curr_line: String
+## The indent of the line currently beign processed
+var curr_indent: int
 
-func tokenise() -> Array[Token]:
-	while len(_lines) > 0:
-		var line: String = get_line()
-		process_line(line)
-		tokens.append(Token.new(TokenType.NEWLINE))
+var indented_with_spaces: bool
+var indented_with_tabs: bool
 
-	return tokenise()
+func _init(_text: String) -> void:
+	tokens = []
+	text = _text
+	lines = text.split("\n")
+	curr_line_num = 1
 
-## consume and return first line of the text
-func get_line() -> String:
-	var line = _lines[0]
-	_lines = _lines.slice(1)
-	return line
+	indented_with_spaces = false
+	indented_with_tabs = false
 
-func process_line(line: String) -> void:
-	line = line.strip_edges()
-	if consume_once("import", line):
-		tokens.append(Token.new(TokenType.IMPORT))
-		line = line.strip_edges()
-		if consume_once("using", line):
-			tokens.append(Token.new(TokenType.USING))
-			line = line.strip_edges()
-		if not add_ident(line):
-			push_error("TODO ADD ERROR SUSTEM")
-	elif consume_once("*", line):
-		tokens.append(Token.new(TokenType.ASTERIX))
-		line = line.strip_edges()
-		var name = consume_until("#", line)
-		tokens.append(Token.new(TokenType.STRING, name))
-	elif consume_once("~", line):
-		tokens.append(Token.new(TokenType.TILDE))
-		line = line.strip_edges()
-		if not add_ident(line):
-			push_error("TODO ADD ERROR SUSTEM")
-	elif consume_once("-", line):
-		tokens.append(Token.new(TokenType.HYPHEN))
-		line = line.strip_edges()
-		var name = consume_until("#", line)
-		tokens.append(Token.new(TokenType.STRING, name))
-	elif consume_once("=><", line):
-		tokens.append(Token.new(TokenType.JUMP_RET))
-		if not add_ident(line):
-			push_error("TODO ADD ERROR SUSTEM")
-	elif consume_once("=>", line):
-		tokens.append(Token.new(TokenType.JUMP))
-		if not add_ident(line):
-			push_error("TODO ADD ERROR SUSTEM")
-	elif consume_some("=", line):
-		tokens.append(Token.new(TokenType.EQUALS))
-		line = line.strip_edges()
-		if not add_ident(line):
-			push_error("TODO ADD ERROR SUSTEM")
-		line = line.strip_edges()
-		if consume_some("=", line):
-			tokens.append(Token.new(TokenType.EQUALS))
+func tokenise() -> Array[Line]:
+	while curr_line_num - 1 < len(lines):
+		curr_indent = 0
+		curr_line = lines[curr_line_num-1]
+		create_line()
+		curr_line_num += 1
+
+	return tokens
+
+func throw_error(msg: String, line_num: int = -1, line: String = "") -> void:
+	if line_num == -1:
+		line_num = curr_line_num
+	if not line:
+		line = lines[curr_line_num-1]
+	push_error('Lexer error "', msg, '" found in line ', str(line_num), 
+				': "', line, '"')
+
+## Process and create the current line
+func create_line() -> void:
+	remove_comments()
+
+	if len(curr_line.strip_edges()) == 0:
+		return
+
+	while consume_indents():
+		pass
+		
+	if consume_once("import"):
+		skip_spaces()
+		if consume_once("using"):
+			skip_spaces()
+			if not make_line_with_ident(LineType.IMPORT_USING):
+				throw_error("Expected identifer to follow import using statement")
+		else:
+			if not make_line_with_ident(LineType.IMPORT):
+				throw_error("Expected identifer to follow import statement")
+
+	elif consume_once("require"):
+		skip_spaces()
+		if consume_once("using"):
+			skip_spaces()
+			if not make_line_with_qualified_ident(LineType.REQUIRE_USING):
+				throw_error("Expected qualfied identifer to follow import statement")
+		else:
+			var ident := consume_ident()
+			if ident.is_empty():
+				throw_error("Expected identifier to follow require statement")
+			skip_spaces()
+			if not consume_once("as"):
+				throw_error("Expected 'as' keyword to follow identifier in require statement")
+			skip_spaces()
+			var sig := consume_qualified_ident()
+			if sig.is_empty():
+				throw_error("Expected qualified identifer for the classtype in require using statement")
+			make_line(LineType.REQUIRE, [ident, sig])
+
+	elif consume_once("*"):
+		skip_spaces()
+		make_line(LineType.CHARACTER, consume_string().strip_edges())
+
+	elif consume_once("~"):
+		skip_spaces()
+		if not make_line_with_ident(LineType.LABEL):
+			throw_error("Expected label identifer to follow label symbol")
+
+	elif consume_once("-"):
+		skip_spaces()
+		make_line(LineType.CHARACTER, consume_string().strip_edges())
+
+	elif consume_once("=><"):
+		skip_spaces()
+		if not make_line_with_ident(LineType.JUMP_RET):
+			throw_error("Expected label identifer to follow jump return symbol")
+
+	elif consume_once("=>"):
+		skip_spaces()
+		if not make_line_with_ident(LineType.JUMP):
+			throw_error("Expected label identifer to follow jump symbol")
+
+	elif consume_once("?"):
+		skip_spaces()
+		var sig := consume_qualified_ident()
+		if sig.is_empty():
+			throw_error("Expected qualified identifer as signal in signal jump statement")
+		skip_spaces()
+		if not consume_once("=>"):
+			throw_error("Expected jump symbol in signal jump statement")
+		skip_spaces()
+		var label = consume_ident()
+		if label.is_empty():
+			throw_error("Expected identifer as label in signal jump statement")
+		make_line(LineType.SIGNAL_JUMP, [sig, label])
+
+	elif consume_some("="):
+		skip_spaces()
+		var heading = consume_ident()
+		if heading.is_empty():
+			throw_error("Expected identifer in heading")
+		skip_spaces()
+		consume_some("=")
+		make_line(LineType.HEADING, heading)
+
 	else:
-		var line_text := consume_until("#", line)
-		tokens.append(Token.new(TokenType.STRING, line_text))
+		var line_text := consume_string()
+		make_line(LineType.LINE, line_text)
 
-	expect_eol(line)
+	expect_eol()
 	return 
 
-## attempts to consume the given prefix, returning true if successful
-func consume_once(prefix: String, line: String) -> bool:
-	if not line.begins_with(prefix): return false
-	line = line.trim_prefix(prefix)
+## Consume any spaces at the current start of the line
+func skip_spaces() -> void:
+	curr_line = curr_line.lstrip(" ")
+
+## Consumes any indents at the start of the line given by tabs or spaces
+func consume_indents() -> bool:
+	var space_trimmed := curr_line.lstrip(" ")
+	var spaces_removed := curr_line.length() - space_trimmed.length()
+	
+	if spaces_removed > 0:
+		curr_line = space_trimmed
+		indented_with_spaces = true
+		if indented_with_tabs:
+			throw_error("Line indented with spaces in a file with tab indents")
+	
+	var tab_trimmed := curr_line.lstrip("\t")
+	var tabs_removed := curr_line.length() - tab_trimmed.length()
+	
+	if tabs_removed > 0:
+		curr_line = tab_trimmed
+		indented_with_tabs = true
+		if indented_with_spaces:
+			throw_error("Line indented with tabs in a file with space indents")
+
+	curr_indent += spaces_removed + tabs_removed
+	return spaces_removed + tabs_removed > 0
+
+## Removes any comments at the end of the line
+func remove_comments() -> void:
+	var idx = curr_line.find("#")
+	if idx != -1:
+		curr_line = curr_line.left(idx)
+	
+## Attempts to consume the given prefix once, returning true if successful
+func consume_once(prefix: String) -> bool:
+	if not curr_line.begins_with(prefix): return false
+	curr_line = curr_line.trim_prefix(prefix)
 	return true
 
-## one or more
-func consume_some(prefix: String, line: String) -> bool:
-	if not line.begins_with(prefix): return false
+## A one or more consume. Returns true if prefix was consumed at least once.
+func consume_some(prefix: String) -> bool:
+	if not curr_line.begins_with(prefix): return false
 
-	while line.begins_with(prefix):
-		line = line.trim_prefix(prefix)
+	while curr_line.begins_with(prefix):
+		curr_line = curr_line.trim_prefix(prefix)
 	
 	return true
 
-## consumes until it reaches the character, not including it. Returns full string if no occurence at all
-func consume_until(what: String, line: String) -> String:
-	var idx = line.find(what)
-
-	var result := line.left(idx)
-	line = line.right(-idx)
+## Consumes the entirety of the current line.
+## Duplicates and returns the line, setting curr_line to ""
+func consume_string() -> String:
+	var result := String(curr_line)
+	curr_line = ""
 	return result
 
-## consumes an identifier from the line, returning "" if there is none
-func consume_ident(line: String) -> String:
+## Make a line and append it to tokens with curr_line_num and curr_indent
+func make_line(type: LineType, val: Variant) -> void:
+	tokens.append(Line.new(type, val, curr_line_num, curr_indent))
+	
+
+## Try to consume an indent and make a line with it as the value
+func make_line_with_ident(type: LineType) -> bool:
+	var ident := consume_ident()
+	if ident.is_empty():
+		return false
+		
+	make_line(type, ident)
+	return true
+
+## Consumes an identifier from the line and returns it. Returns "" if none is found.
+func consume_ident() -> String:
 	var n: int = 1
-	while n <= len(line) and line.left(n).is_valid_ascii_identifier():
+	while n <= len(curr_line) and curr_line.left(n).is_valid_ascii_identifier():
 		n += 1
-
-	var ident := line.left(n-1)
-	line = line.right(-(n-1))
-
+		
+	if n == 1:
+		return ""
+	
+	var ident := curr_line.left(n-1)
+	curr_line = curr_line.right(-(n-1))
 	return ident
 
-## consumes an ident from the string, adding a token and reutnring false if there was no ident
-func add_ident(line: String) -> bool:
-	var ident := consume_ident(line)
-	if ident:
-		tokens.append(Token.new(TokenType.IDENT, ident))
-		return true
-	return false
+## Consumes a qualified indentifer from the line and returns it
+func consume_qualified_ident() -> String:
+	var qualified_ident := ""
 
-## Tries to consume a heading (ident preceeding a colon). REturns the ident
-func consume_heading(line: String) -> String:
-	var n: int = 1
-	while n <= len(line) and line.left(n).is_valid_ascii_identifier():
-		n += 1
+	var ident: = consume_ident()
+	if not ident: return qualified_ident
+	qualified_ident += ident
 
-	if not line.right(-(n-1)).begins_with(":"): return ""
+	if not consume_once("."):
+		return qualified_ident
 
-	var ident := line.left(n-1)
-	line = line.right(-(n-1))
-	return ident
+	while true:
+		ident = consume_ident()
+		if not ident: 
+			throw_error("Qualified indentifier cannot end in a period")
+		qualified_ident += "." + ident
 
-## when you are finished parsing the line. Consumes comments, throws error otherwise
-func expect_eol(line: String) -> void:
-	line = line.strip_edges()
-	if not line.begins_with("#"):
-		push_error("TODO ERROR SYSTEM")
+		if not consume_once("."): 
+			return qualified_ident
 	
-	line = ""
+	push_error("Error in lexer. Should be unreacheable.")
+	return qualified_ident
+
+## Try to consume an indent and make a line with it as the value
+func make_line_with_qualified_ident(type: LineType) -> bool:
+	var qualified_ident := consume_qualified_ident()
+	if not qualified_ident:
+		return false
+		
+	make_line(type, qualified_ident)
+	return true
+
+## Expect the line to be finished. Throws an error if anything other than a comment or whitespace is found
+func expect_eol() -> void:
+	skip_spaces()
+	if curr_line.length() != 0:
+		throw_error("Expected end of line but found '" + curr_line + "' instead")
 	
+	curr_line = ""
+	
+func display_debug() -> void:
+	for line in tokens:
+		print(line)
+
+		

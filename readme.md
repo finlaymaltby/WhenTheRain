@@ -3,6 +3,7 @@ TODO:
     - store range, cooldown etc.
     - Finish writing sword and shield
 	- Cancel weapon should have to await. Overhaul for auto_weapon as well
+	- use a mutex for focus https://docs.godotengine.org/en/stable/classes/class_mutex.html#class-mutex
 
 - UI
     - Get buttons to use godot native focus + fix hacky pressed focus 'solution'
@@ -17,6 +18,9 @@ TODO:
     
 
 GET RID OFO ALL STATIC FUNC FROM. REMOVE PRINTS AND BREAKPOOINT S
+investigate abstract classes
 find . -type f -name '*.gd' -not -path './addons/*' -print0 | xargs -0 cat | wc
 
+
 should just write my own dialogue system at this point
+- namespace collisions

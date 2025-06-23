@@ -1,0 +1,40 @@
+# this is a comment
+import DialogueManager # import a global script
+import using GlobalStory # import * from OtherGlobal
+
+require db as DialogueBalloon # requires a DialogueBalloon to be passed in, referred to as 'db'
+require using CombatDemoAngryGuy # requires a characterName and adds all methods and properties to the 
+require ch as PEvent.EnemyNear
+    
+==  HEADING_FIRST == # declares a heading (big deal)
+? enemy_very_close => ANOTHER_HEADING # whenever the signal occurs, jump to the label
+? db.finished => jump_to_another_label 
+
+* bob  # an asterix followed by a name sets the current speaker
+
+This line can be anything, and will be read out
+This line will follow the one above it
+More lines isn't this so great
+I'm asking a question now.
+- first response I'm saying this
+	=> make_this_jump
+- but what if i said this
+	=>< label_name
+- or this instead
+	* name of new person speaking
+	~ label_name # this is a label name that can be jumped to:
+	talk tlak
+
+
+
+=== ANOTHER_HEADING == 
+* evil gary
+HI h i hih
+asdfsad
+~ jump_to_another_label
+sdfasdfasdf
+asfasklja 
+
+asdfa faf asfasklja
+~ make_this_jump
+more talking

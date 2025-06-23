@@ -1,4 +1,4 @@
-extends CombatAngryGuy
+class_name CombatDemoAngryGuy extends CombatAngryGuy
 
 ## angy guy expecting you to attack?
 @onready var is_prepped := false
