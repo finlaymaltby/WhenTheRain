@@ -4,7 +4,9 @@ class_name CombatCharacter extends CombatBody
 @export var enemy: CombatBody
 
 ## the dialogue reading out
-@export var dialogue: DialogueResource
+@export_file("*.txt") var dialogue_path: String
+
+var dialogue: Dialogue
 
 ## balloon to display dialogue to
 @export var balloon: DialogueBalloon

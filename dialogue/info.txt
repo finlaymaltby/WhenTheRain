@@ -1,8 +1,8 @@
 # this is a comment
 import GlobalStory # import a global script
-import using OtherGlobal # import * from OtherGlobal
 require db as DialogueBalloon # requires a DialogueBalloon to be passed in, referred to as 'db'
 require using CharacterName.ParticularState # requires a characterName and adds all methods and properties to the namespace
+# you can only have one require using statment per file
     
 ==  HEADING_FIRST == # declares a heading (big deal)
 ? player_near => jump_to_this_label # whenever the signal occurs, jump to the label

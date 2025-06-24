@@ -24,3 +24,4 @@ find . -type f -name '*.gd' -not -path './addons/*' -print0 | xargs -0 cat | wc
 
 should just write my own dialogue system at this point
 - sort out whethere to import .subclasses
+- add ifs

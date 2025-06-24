@@ -1,13 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://dfkvei8icnjje"]
+[gd_scene load_steps=8 format=3 uid="uid://dfkvei8icnjje"]
 
 [ext_resource type="Script" uid="uid://cewe66a1fglbx" path="res://areas/demo/demo.gd" id="1_f2jw5"]
 [ext_resource type="Texture2D" uid="uid://bfqowsjqa5xxp" path="res://areas/demo/StonyBackground.png" id="1_i22nb"]
 [ext_resource type="PackedScene" uid="uid://bqxb15udwi07" path="res://entities/player/explore/player.tscn" id="2_ul47n"]
 [ext_resource type="PackedScene" uid="uid://ck633mt16j2wm" path="res://entities/dummy/explore/dummy.tscn" id="3_qsyir"]
 [ext_resource type="Script" uid="uid://d1uufrolkpbqn" path="res://utils/components/interactable.gd" id="4_f2jw5"]
-[ext_resource type="Resource" uid="uid://b4vxpxfb7spfa" path="res://areas/demo/dialogue/demo_guy.dialogue" id="5_f2jw5"]
 [ext_resource type="PackedScene" uid="uid://c8rr8smgvfjk4" path="res://ui/dialogue/scenes/default_balloon.tscn" id="7_lvddk"]
-[ext_resource type="Script" uid="uid://dutbdcy34iibi" path="res://ui/dialogue/scripts/input_balloon.gd" id="8_qwjex"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lvddk"]
 radius = 83.006
@@ -53,16 +51,17 @@ polygon = PackedVector2Array(778, 900, 776, 513, 811, 422, 873, 430, 868, 892)
 [node name="Dummy" parent="." instance=ExtResource("3_qsyir")]
 position = Vector2(1482, 463)
 
-[node name="Actionable" type="Area2D" parent="Dummy"]
+[node name="Interactable" type="Area2D" parent="Dummy" node_paths=PackedStringArray("balloon")]
 collision_layer = 16
 collision_mask = 32
 script = ExtResource("4_f2jw5")
-dialogue = ExtResource("5_f2jw5")
+dialogue_path = "res://areas/demo/dialogue/demo_guy_dialogue.txt"
+dialogue_start = null
+balloon = NodePath("../../DefaultBalloon")
 metadata/_custom_type_script = "uid://d1uufrolkpbqn"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dummy/Actionable"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dummy/Interactable"]
 position = Vector2(-4, -68)
 shape = SubResource("CircleShape2D_lvddk")
 
 [node name="DefaultBalloon" parent="." instance=ExtResource("7_lvddk")]
-script = ExtResource("8_qwjex")

@@ -59,7 +59,6 @@ func try_hit(hurt: HurtBox) -> void:
 	while true:
 		ray.force_raycast_update()
 		if not ray.is_colliding():
-			breakpoint
 			push_error("something went wrong here, check ray collision")
 		
 		var obj = ray.get_collider()

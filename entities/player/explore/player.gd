@@ -37,7 +37,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("interact"):
+	if event.is_action_released("interact"):
 		var interacts = $ActionableFinder.get_overlapping_areas()
 		if interacts.size() == 0:
 			return

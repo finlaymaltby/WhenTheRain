@@ -76,8 +76,7 @@ func _input(event: InputEvent) -> void:
 		buttons[focus_idx].button_pressed = true
 	elif is_focus and (event.is_action_released("interact") or event.is_action_released("ui_accept")):
 		response_selected.emit(responses[focus_idx])
-	else:
-		return
+
 		
 	get_viewport().set_input_as_handled()
 

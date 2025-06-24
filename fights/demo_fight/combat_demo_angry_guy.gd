@@ -3,11 +3,9 @@ class_name CombatDemoAngryGuy extends CombatAngryGuy
 ## angy guy expecting you to attack?
 @onready var is_prepped := false
 
-
 var enemy_very_close: PEvent
 var enemy_close: PEvent
 var enemy_leaves: PEvent
-
 
 func _ready() -> void:
 	super()
@@ -18,9 +16,9 @@ func _ready() -> void:
 
 	enemy_very_close = PEvent.EnemyNear.new(state, DIST_V_CLOSE)
 	enemy_close = PEvent.EnemyNear.new(state, DIST_CLOSE)
-	enemy_leaves = PEvent.EnemyNotNear.new(state, DIST_CLOSE)
+	enemy_leaves = PEvent.EnemyNotNear.new(state, DIST_CLOSE)	
 
-	balloon.start(dialogue, "start", [self])
+	balloon.start(dialogue, "start")
 	
 	get_tree().create_timer(2).timeout.connect(swing)
 

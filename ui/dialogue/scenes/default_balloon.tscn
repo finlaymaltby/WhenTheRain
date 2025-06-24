@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dutbdcy34iibi" path="res://ui/dialogue/scripts/input_balloon.gd" id="2_0xicv"]
 [ext_resource type="Theme" uid="uid://bpeymwg5tqo4p" path="res://ui/assets/default_dark.tres" id="2_6adan"]
-[ext_resource type="PackedScene" uid="uid://ckvgyvclnwggo" path="res://addons/dialogue_manager/dialogue_label.tscn" id="2_a8ve6"]
+[ext_resource type="Script" uid="uid://defbcvafcq5ln" path="res://ui/dialogue/scripts/dialogue_label.gd" id="3_0xicv"]
 [ext_resource type="Script" uid="uid://b2nfu7y6mgk4n" path="res://ui/dialogue/scripts/response_menu.gd" id="3_gx3xm"]
 
 [node name="Balloon" type="Control"]
@@ -61,15 +61,17 @@ alignment = 1
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/DialogueContainer"]
 layout_mode = 2
 
-[node name="DialogueLabel" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/DialogueContainer" instance=ExtResource("2_a8ve6")]
+[node name="DialogueLabel" type="RichTextLabel" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/DialogueContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 2
-text = "asdlfjadsflasjf alskdfj
-asdf"
-skip_action = &"cancel"
-seconds_per_step = 0.03
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "alsdfkjasdlfk;ajsdfl;kajsdf
+asdlfadsfasdf"
+fit_content = true
+script = ExtResource("3_0xicv")
+metadata/_custom_type_script = "uid://defbcvafcq5ln"
 
 [node name="ResponseMenu" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer" node_paths=PackedStringArray("button_template")]
 unique_name_in_owner = true

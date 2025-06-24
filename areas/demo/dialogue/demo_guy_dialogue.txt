@@ -1,0 +1,22 @@
+import GlobalStory
+require demo as Demo
+
+== START ==
+* Demo Guy
+Hi, welcome to this demo
+We have not spoken before
+~ this_label
+$ GlobalStory.talked_to_demo = true
+Do you think I look ugly?
+That's okay
+* Still Demo Guy
+I was made with love
+What a wonderful world we are going to create [wait=2]. Louis Joel said that. What a time to be alive blah blah blah fillling the text box
+So do you wanna fight or nah
+- yeah
+	yay
+	$ demo.local_var = 3
+- nah 
+	Okay then have a nice day
+blah blah say this
+=> END
