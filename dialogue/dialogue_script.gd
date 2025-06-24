@@ -19,8 +19,14 @@ func _ready() -> void:
 	print()
 	print("PARSER")
 	var parser := Parser.new(lexer.tokens)
-	parser.parse()
+	var res := parser.parse()
 	parser.display_debug()
-
 	print()
+	print()
+
+	var dialogue := Dialogue.new(res)
+	dialogue.add_named_input("db", DialogueBalloon.new())
+	dialogue.add_input(CombatDemoAngryGuy.new())
+	dialogue.add_input(null)	
+	dialogue.compile()
 	

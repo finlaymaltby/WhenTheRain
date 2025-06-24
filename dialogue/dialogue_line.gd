@@ -15,15 +15,22 @@ class Data extends RefCounted:
 var id: int
 var data: Data
 
-func next() -> int:
-	return id + 1
-
 func _init(_id: int, _data: Data) -> void:
 	id = _id
 	data = _data
 
 func _to_string() -> String:
 	return str(id) + ": " + str(data)
+
+class DLabel extends DLine:
+	var name: String
+	func _init(_id: int, _name: String, _data: Data) -> void:
+		id = _id
+		name = _name
+		data = _data
+
+	func _to_string() -> String:
+		return str(id) + ": " + name + " " + str(data)
 
 class Turn extends DLine:
 	var speaker: String
@@ -38,6 +45,31 @@ class Turn extends DLine:
 	func _to_string() -> String:
 		return str(id) + ": " + "'" + speaker + "' says '" + turn + "' " + str(data)
 
+class Question extends Turn:
+	var responses: Array[int]
+
+	func _init(_id: int, _speaker: String, _turn: String, _responses: Array[int],  _data: Data) -> void:
+		id = _id
+		speaker = _speaker
+		turn = _turn
+		responses = _responses
+		data = _data
+
+	func _to_string() -> String:
+		return str(id) + ": '" + speaker + "' asks '" + turn + "' " + str(responses) + " " + str(data)
+
+class Response extends DLine:
+	var response: String
+	func _init(_id: int, _response: String, _data: Data) -> void:
+		id = _id
+		response = _response
+		data = _data
+
+	func _to_string() -> String:
+		return str(id) + ": response '" + response + "' " + str(data)
+
+class Mutation extends DLine:
+	pass
 
 class Jump extends DLine:
 	var jump_id: int
@@ -45,16 +77,10 @@ class Jump extends DLine:
 		id = _id
 		jump_id = _jump_id
 		data = _data
-	
-	func next() -> int:
-		return jump_id
 
 	func _to_string() -> String:
 		return str(id) + ": ( => " + str(jump_id) + ") " + str(data)
 
-class Mutation extends DLine:
-	pass
-
-class Question extends Turn:
-	pass
-
+class JumpRet extends Jump:
+	func _to_string() -> String:
+		return str(id) + ": ( =>< " + str(jump_id) + ") " + str(data)

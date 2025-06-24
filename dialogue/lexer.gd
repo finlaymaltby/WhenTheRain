@@ -156,7 +156,7 @@ func create_line() -> void:
 
 	elif consume_once("-"):
 		skip_spaces()
-		make_line(LineType.CHARACTER, consume_string().strip_edges())
+		make_line(LineType.RESPONSE, consume_string().strip_edges())
 
 	elif consume_once("=><"):
 		skip_spaces()

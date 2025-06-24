@@ -4,7 +4,7 @@ import using GlobalStory # import * from OtherGlobal
 
 require db as DialogueBalloon # requires a DialogueBalloon to be passed in, referred to as 'db'
 require using CombatDemoAngryGuy # requires a characterName and adds all methods and properties to the 
-require ch as PEvent.EnemyNear
+require ch as PEvent
     
 ==  HEADING_FIRST == # declares a heading (big deal)
 ? enemy_very_close => ANOTHER_HEADING # whenever the signal occurs, jump to the label
