@@ -10,7 +10,6 @@ func _ready() -> void:
 	var file := FileAccess.open("res://dialogue/example.txt", FileAccess.READ)
 	var content := file.get_as_text(true)
 
-
 	var lexer := Lexer.new(content)
 	lexer.tokenise()
 	print("LEXER")
@@ -24,9 +23,9 @@ func _ready() -> void:
 	print()
 	print()
 
-	var dialogue := Dialogue.new(res)
-	dialogue.add_named_input("db", DialogueBalloon.new())
-	dialogue.add_input(CombatDemoAngryGuy.new())
-	dialogue.add_input(null)	
-	dialogue.compile()
+	var compiler := Compiler.new(res)
+	compiler.add_named_input("db", DialogueBalloon.new())
+	compiler.add_input(CombatDemoAngryGuy.new())
+	compiler.add_input(null)
+	compiler.compile()
 	

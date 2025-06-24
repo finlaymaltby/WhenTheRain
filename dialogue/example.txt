@@ -18,12 +18,14 @@ More lines isn't this so great
 I'm asking a question now.
 - first response I'm saying this
 	=> make_this_jump
+	$ is_prepped = true
 - but what if i said this
 	=>< label_name
 - or this instead
 	* name of new person speaking
 	~ label_name # this is a label name that can be jumped to:
 	talk tlak
+	$ is_prepped = false
 
 
 

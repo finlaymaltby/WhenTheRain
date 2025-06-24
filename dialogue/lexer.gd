@@ -32,6 +32,8 @@ class Line extends RefCounted:
 				string += "LABEL |" + str(val) + "|"
 			LineType.CHARACTER:
 				string += 'CHARACTER "' + val + '"'
+			LineType.SET:
+				string += "SET ||" + str(val[0]) + "|| = " + str(val[1])
 			LineType.JUMP:
 				string += "JUMP |" + str(val) + "|"
 			LineType.JUMP_RET:
@@ -54,6 +56,7 @@ enum LineType {
 	HEADING,
 	LABEL,
 	CHARACTER,
+	SET,
 	
 	JUMP,
 	JUMP_RET,
@@ -69,6 +72,7 @@ var tokens: Array[Line]
 var text: String
 ## Lines of text.
 var lines: PackedStringArray
+var was_successful: bool
 
 ## The current line number.
 var curr_line_num: int
@@ -85,6 +89,7 @@ func _init(_text: String) -> void:
 	text = _text
 	lines = text.split("\n")
 	curr_line_num = 1
+	was_successful = true
 
 	indented_with_spaces = false
 	indented_with_tabs = false
@@ -105,6 +110,7 @@ func throw_error(msg: String, line_num: int = -1, line: String = "") -> void:
 		line = lines[curr_line_num-1]
 	push_error('Lexer error "', msg, '" found in line ', str(line_num), 
 				': "', line, '"')
+	was_successful = false
 
 ## Process and create the current line
 func create_line() -> void:
@@ -157,6 +163,18 @@ func create_line() -> void:
 	elif consume_once("-"):
 		skip_spaces()
 		make_line(LineType.RESPONSE, consume_string().strip_edges())
+
+	elif consume_once("$"):
+		skip_spaces()
+		var ident := consume_qualified_ident()
+		if ident.is_empty():
+			throw_error("Expected qualified identifier to follow set symbol")
+		skip_spaces()
+		if not consume_once("="):
+			throw_error("Expected equal sign to follow identifier in set statement")
+		skip_spaces()
+		var string := consume_string()
+		make_line(LineType.SET, [ident, string])
 
 	elif consume_once("=><"):
 		skip_spaces()

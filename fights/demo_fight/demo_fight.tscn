@@ -32,11 +32,11 @@ shape = SubResource("WorldBoundaryShape2D_o10rv")
 position = Vector2(1438, 534)
 motion_mode = 0
 
-[node name="AngryGuy" parent="." node_paths=PackedStringArray("balloon", "enemy") instance=ExtResource("6_10o0n")]
+[node name="AngryGuy" parent="." node_paths=PackedStringArray("enemy", "balloon") instance=ExtResource("6_10o0n")]
 position = Vector2(346, 597)
+enemy = NodePath("../SidePlayer")
 dialogue = ExtResource("6_kyqyg")
 balloon = NodePath("../CanvasLayer/Balloon")
-enemy = NodePath("../SidePlayer")
 
 [node name="HealthDisplay" type="Label" parent="." node_paths=PackedStringArray("character")]
 offset_left = 24.0

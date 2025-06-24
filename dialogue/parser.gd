@@ -4,7 +4,7 @@ class_name Parser extends RefCounted
 
 ## The created dialogue resource
 var resource: DResource
-
+var was_successful: bool
 ## The input token list.
 var tokens: Array[Lexer.Line]
 
@@ -23,6 +23,7 @@ var curr_speaker: String
 
 func _init(_tokens: Array[Lexer.Line]) -> void:
 	resource = DResource.empty()
+	was_successful = true
 	tokens = _tokens
 	properties = []
 	methods = []
@@ -41,6 +42,8 @@ func parse() -> DResource:
 func throw_error(msg: String, line: Lexer.Line) -> void:
 	push_error('Parser error "', msg, '" found in line ', str(line.line_num), 
 				': "', line, '"')
+
+	was_successful = false
 
 func add_labels() -> void:
 	for i in range(len(tokens)):
@@ -161,7 +164,7 @@ func parse_imports() -> void:
 			Lexer.LineType.REQUIRE_USING:
 				var script := find_script(line.val as String, line)
 				add_names(line.val, script, false, line)
-				resource.add_require(script, "")
+				resource.add_require(script, line.val)
 			_:
 				body_start = i
 				return
@@ -205,6 +208,7 @@ func parse_heading_block() -> void:
 				push_error("Parser error should be unreacheable")
 			_:
 				throw_error("Unexpected line type in heading block", line)
+				curr_id += 1
 			
 		
 ## Parses lines that can appear anywhere: turns, jumps, labels, character swaps, etc.
@@ -217,6 +221,8 @@ func parse_simple_line() -> bool:
 			resource.lines.append(DLine.DLabel.new(curr_id, tokens[curr_id].val, get_curr_data()))
 		Lexer.LineType.CHARACTER:
 			curr_speaker = line.val
+		Lexer.LineType.SET:
+			parse_set()
 		Lexer.LineType.JUMP:
 			resource.lines.append(DLine.Jump.new(curr_id, get_label_id(line.val), get_curr_data()))
 		Lexer.LineType.JUMP_RET:
@@ -242,6 +248,7 @@ func parse_signal() -> void:
 
 	if not valid_ident(sig):
 		throw_error("Could not find signal '" + str(sig) + "' in namespace", line)
+		curr_id += 1
 		return
 	var label := get_label_id(line.val[1] as String)
 	if label == -1:
@@ -250,6 +257,28 @@ func parse_signal() -> void:
 
 	curr_signals[sig] = label
 	curr_id += 1
+
+func parse_set() -> void:
+	var line := tokens[curr_id]
+	var var_path := line.val[0] as String
+	if not valid_ident(var_path):
+		throw_error("Could not find variable '" + var_path + "' in namespace", line)
+		curr_id += 1
+		return
+	var split :=  var_path.split(".")
+	var property: String
+	var obj_name: String
+
+	if len(split) == 1:
+		property = var_path
+		obj_name = ""
+	else:
+		obj_name = ".".join(split.slice(0, -1))
+		property = split.get(len(split)-1)
+
+	resource.lines.append(DLine.Set.new(curr_id, obj_name, property, line.val[1], get_curr_data()))
+	curr_id += 1
+
 
 func is_question() -> bool:
 	if tokens[curr_id].type != Lexer.LineType.LINE or curr_id+1 == len(tokens):

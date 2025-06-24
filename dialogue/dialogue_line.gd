@@ -71,6 +71,21 @@ class Response extends DLine:
 class Mutation extends DLine:
 	pass
 
+class Set extends Mutation:
+	var obj_name: String
+	var property: String
+	var value: String
+
+	func _init(_id: int, _obj_name: String, _property: String, _value: String, _data: Data) -> void:
+		id = _id
+		data = _data
+		obj_name = _obj_name
+		property = _property
+		value = _value
+
+	func _to_string() -> String:
+		return str(id) + ": SET " + obj_name + ".get(" + property + ") " + " = " + value + str(data)
+
 class Jump extends DLine:
 	var jump_id: int
 	func _init(_id: int, _jump_id: int, _data: Data) -> void:
