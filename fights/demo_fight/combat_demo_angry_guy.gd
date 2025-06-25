@@ -21,6 +21,7 @@ func _ready() -> void:
 	dialogue = Dialogue.compile_from_raw(dialogue_path, [self, enemy_close], {})
 	
 	balloon.start(dialogue, "START")
+	enemy_very_close.firing.connect(print.bind("hi"))
 	
 	get_tree().create_timer(2).timeout.connect(swing)
 

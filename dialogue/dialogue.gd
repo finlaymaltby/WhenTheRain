@@ -1,11 +1,19 @@
 class_name Dialogue extends Node
 
+signal interrupted
+
 ## The corresponding instance of the object referred to by the string name in the file
 var object_bindings: Dictionary[String, Object]
+var signal_bindings: Dictionary[String, Signal]
+var _signal_arg_counts: Dictionary[String, int]
 
 var res: DialogueResource
 
-var _curr_id: int
+var _curr_id: int:
+	set(val):
+		update_interrupts(val)
+		_curr_id = val
+
 var _curr_line: DialogueLine:
 	get:
 		return res.lines[_curr_id]
@@ -14,6 +22,7 @@ var _curr_line: DialogueLine:
 		_curr_line = val
 
 var curr_turn: DialogueLine.Turn
+var _curr_interrupts: Array[DialogueLine.Interrupt]
 
 func _init(resource: DialogueResource, _object_bindings: Dictionary[String, Object]) -> void:
 	res = resource
@@ -43,19 +52,22 @@ func start_at(label: String) -> void:
 func next() -> void:
 	if is_finished():
 		return
-	_curr_id += 1
-	await run_until_turn()
+	
+	run_until_turn()
+
+func run() -> void:
+	_curr_id = _curr_line.next_id
+
+	if _curr_line is DialogueLine.Mutation:
+		await _curr_line.run_mutation(self)
 
 func run_until_turn() -> void:
 	while not is_finished():
+		run()
+
 		if _curr_line is DialogueLine.Turn:
 			curr_turn = _curr_line
 			return 
-
-		if _curr_line is DialogueLine.Mutation:
-			await _curr_line.run_mutation(self)
-
-		_curr_id = _curr_line.next_id
 
 func get_responses() -> Array[DialogueLine.Response]:
 	if not curr_turn is DialogueLine.Question:
@@ -81,3 +93,18 @@ func jump_end() -> void:
 
 func is_finished() -> bool:
 	return _curr_id >= len(res.lines) or _curr_id == DialogueScript.ID_END
+
+func update_interrupts(next_id: int) -> void:
+	for interrupt in _curr_interrupts:
+		signal_bindings[interrupt.signal_name].disconnect(_on_interrupt)
+
+	for interrupt in res.lines[next_id].interrupts:
+		var sig := signal_bindings[interrupt.signal_name]
+		var args := _signal_arg_counts[interrupt.signal_name]
+		sig.connect(_on_interrupt.bind(interrupt).unbind(args))
+
+	_curr_interrupts = res.lines[next_id].interrupts
+
+func _on_interrupt(interrupt: DialogueLine.Interrupt) -> void:
+	interrupt.run_mutation(self)
+	interrupted.emit()

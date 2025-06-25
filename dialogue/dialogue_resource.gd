@@ -32,6 +32,7 @@ func _init() -> void:
 ## Returns an error message
 func add_global(global: Script, name: String) -> String:
 	_global_imports[global] = name
+	add_script(name, global)
 	return ""
 
 ## Returns an error message
@@ -40,6 +41,7 @@ func add_require(script: Script, alias: String) -> String:
 		if _required_objects.get(script) == alias:
 			return "You must qualify names when requiring more than one instance of the same type"
 	_required_objects[script] = alias
+	add_script(alias, script)
 	return ""
 
 func add_script(name: String, script: Script) -> void:

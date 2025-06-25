@@ -34,6 +34,9 @@ func start(_dialogue: Dialogue, title: String) -> void:
 	is_waiting = false
 	if not dialogue.has_label(title):
 		push_error("No label exists with the given title: ", title)
+	if not dialogue.interrupted.is_connected(_on_dialogue_interrupted):
+		dialogue.interrupted.connect(_on_dialogue_interrupted)
+
 	dialogue.start_at(title)
 	next()
 
@@ -57,6 +60,10 @@ func apply_turn() -> void:
 	if not turn.text.is_empty():
 		dialogue_label.start_typing()
 		await dialogue_label.finished_typing
+
+	if dialogue.is_finished():
+		finish()
+		return
 		
 	if turn is DialogueLine.Question:
 		response_menu.responses = dialogue.get_responses()
@@ -85,6 +92,8 @@ func skip() -> void:
 
 ## when there are no lines left in the dialogue dialogue
 func finish() -> void:
+	dialogue.interrupted.disconnect(_on_dialogue_interrupted)
+
 	dialogue = null
 	is_waiting = false
 	hide()
@@ -117,3 +126,7 @@ func leave() -> void:
 func _on_responses_menu_response_selected(response: DialogueLine.Response) -> void:
 	dialogue.pick_response(response)
 	next()
+
+func _on_dialogue_interrupted() -> void:
+	skip()
+	apply_turn()

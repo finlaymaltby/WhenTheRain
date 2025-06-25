@@ -12,6 +12,8 @@ var tokens: Array[DLexer.Line]
 var properties: Array[String]
 var methods: Array[String]
 var signals: Array[String]
+# Stores paths of objects whose properties can't be accessed for static type analysis
+var opaque_paths: Array[String] = []
 
 ## The idx of the first heading (i.e. after all the imports)
 var body_start: int
@@ -20,7 +22,7 @@ const skipped_line_types := [DLexer.LineType.IMPORT, DLexer.LineType.REQUIRE,
 
 var curr_idx: int
 var curr_heading: int
-var curr_interrupts: Dictionary[String, int]
+var curr_interrupts: Dictionary[String, DialogueLine.Interrupt]
 var curr_speaker: String
 
 func _init(_tokens: Array[DLexer.Line], _resource: DialogueResource = null) -> void:
@@ -38,11 +40,15 @@ func parse() -> DialogueResource:
 	
 	while curr_idx < len(tokens) and tokens[curr_idx].type == DLexer.LineType.HEADING:
 		parse_heading_block()
+		resource.lines[-1].next_id = DialogueScript.ID_END
 
 	check_indentation()
 	return resource
 
-func throw_error(msg: String, line: DLexer.Line) -> void:
+func throw_error(msg: String, line: DLexer.Line = null) -> void:
+	if not line:
+		line = tokens[curr_idx]
+
 	push_error('DParser error "', msg, '" found in line ', str(line.line_num), 
 				': "', line, '"')
 
@@ -119,22 +125,19 @@ func add_names(name: String, script: Script, qualified: bool, line: DLexer.Line)
 				add_names(key, constant_map[key], true, line)
 
 	for property in script.get_script_property_list():
-		if qualified:
-			properties.append(name + "." + property.get("name"))
-		else:
-			properties.append(property.get("name"))
+		if property.usage & PROPERTY_USAGE_SCRIPT_VARIABLE:
+			var prop_name: String = name + "." + property.name if qualified else property.name
+			properties.append(prop_name)
+			if property.type == TYPE_OBJECT: # doesn't carry script info so it cannot be verified
+				opaque_paths.append(prop_name) 
 
 	for method in script.get_script_method_list():
-		if qualified:
-			methods.append(name + "." + method.get("name"))
-		else:
-			methods.append(method.get("name"))
-
+		var method_name: String = name + "." + method.name if qualified else method.name
+		methods.append(method_name)
+	
 	for sig in script.get_script_signal_list():
-		if qualified:
-			signals.append(name + "." + sig.get("name"))
-		else:
-			signals.append(sig.get("name"))
+		var signal_name: String = name + "." + sig.name if qualified else sig.name
+		signals.append(signal_name)
 
 func parse_imports() -> void:
 	for i in range(len(tokens)):
@@ -158,8 +161,33 @@ func parse_imports() -> void:
 				body_start = i
 				return
 
-func valid_ident(name: String) -> bool:
+func valid_name(name: String) -> bool:
+	for opaque in opaque_paths:
+		if name.begins_with(opaque):
+			return true # default to true if it is not possible to analyse the validity of a property
 	return properties.has(name) or methods.has(name) or signals.has(name)
+
+func get_obj_name(name: String) -> String:
+	if not valid_name(name):
+		throw_error("Cannot access object of invalid name")
+
+	var head := DialogueScript.ident_head(name)
+
+	if head in resource._script_map.keys():
+		return head
+
+	return ""
+
+func get_property_path(name: String) -> String:
+	if not valid_name(name):
+		throw_error("Cannot access property path of invalid name")
+
+	var head := DialogueScript.ident_head(name)
+
+	if head in resource._script_map.keys():
+		return (name.replace(".", ":") as NodePath).get_concatenated_subnames()
+
+	return name.replace(".", ":")
 
 func get_label_id(name: String) -> int:
 	var id := 0
@@ -176,14 +204,11 @@ func get_label_id(name: String) -> int:
 	throw_error("Could not find label '" + name + "' in the file", tokens[curr_idx])
 	return -1
 
-func get_curr_data() -> DialogueLine.Data:
-	return DialogueLine.Data.new(curr_heading, curr_interrupts)
-
 func get_curr_id() -> int:
 	return len(resource.lines)
 
 func add_label_line() -> void:
-	resource.lines.append(DialogueLine.new(get_curr_id(), get_curr_data()))
+	resource.lines.append(DialogueLine.new(get_curr_id(), curr_interrupts.values()))
 
 ## Returns whether continue
 func parse_heading_block() -> void:
@@ -193,7 +218,7 @@ func parse_heading_block() -> void:
 	curr_heading = get_curr_id()
 	curr_interrupts = {}
 	curr_speaker = ""
-	resource.lines.append(DialogueLine.DLabel.new(get_curr_id(), tokens[curr_idx].val, get_curr_data()))
+	resource.lines.append(DialogueLine.Title.new(get_curr_id(), tokens[curr_idx].val, curr_interrupts.values()))
 
 	curr_idx += 1
 	
@@ -219,7 +244,7 @@ func parse_simple_line() -> bool:
 
 	match line.type:
 		DLexer.LineType.LABEL:
-			resource.lines.append(DialogueLine.DLabel.new(get_curr_id(), tokens[curr_idx].val, get_curr_data()))
+			resource.lines.append(DialogueLine.Title.new(get_curr_id(), tokens[curr_idx].val, curr_interrupts.values()))
 			curr_idx += 1
 		DLexer.LineType.CHARACTER:
 			curr_speaker = line.val
@@ -229,10 +254,10 @@ func parse_simple_line() -> bool:
 		DLexer.LineType.EXECUTE:
 			parse_execute()
 		DLexer.LineType.JUMP:
-			resource.lines.append(DialogueLine.Jump.new(get_curr_id(), get_label_id(line.val), get_curr_data()))
+			resource.lines.append(DialogueLine.Jump.new(get_curr_id(), get_label_id(line.val), curr_interrupts.values()))
 			curr_idx += 1
 		DLexer.LineType.JUMP_RET:
-			resource.lines.append(DialogueLine.JumpRet.new(get_curr_id(), get_label_id(line.val), get_curr_data()))
+			resource.lines.append(DialogueLine.JumpRet.new(get_curr_id(), get_label_id(line.val), curr_interrupts.values()))
 			curr_idx += 1
 		DLexer.LineType.TURN:
 			if not curr_speaker:
@@ -240,7 +265,7 @@ func parse_simple_line() -> bool:
 			if is_question():
 				parse_question()
 			else:
-				resource.lines.append(DialogueLine.Turn.new(get_curr_id(), curr_speaker, line.val, get_curr_data()))
+				resource.lines.append(DialogueLine.Turn.new(get_curr_id(), curr_speaker, line.val, curr_interrupts.values()))
 				curr_idx += 1
 		_:
 			did_parse = false
@@ -249,40 +274,43 @@ func parse_simple_line() -> bool:
 
 func parse_interrupt() -> void:
 	var line := tokens[curr_idx]
-	var sig := line.val[0] as String
+	var signal_name := line.val[0] as String
 
-	if not valid_ident(sig):
-		throw_error("Could not find signal '" + str(sig) + "' in namespace", line)
+	if not valid_name(signal_name):
+		throw_error("Could not find signal '" + str(signal_name) + "' in namespace", line)
 		curr_idx += 1
 		return
-	var label := get_label_id(line.val[1] as String)
 
-	curr_interrupts[sig] = label
+	var label := get_label_id(line.val[1] as String)
+	var interrupt := DialogueLine.InterruptJump.new(
+		get_obj_name(signal_name), 
+		get_property_path(signal_name), 
+		label)
+
+	curr_interrupts[signal_name] = interrupt
 	curr_idx += 1
 
 func parse_set() -> void:
 	var line := tokens[curr_idx]
 	var var_path := line.val[0] as String
-	if not valid_ident(var_path):
+	if not valid_name(var_path):
 		throw_error("Could not find variable '" + var_path + "' in namespace", line)
 		curr_idx += 1
 		return
-
-	var property: String
-	var obj_name: String
-
-	if DialogueScript.is_ident(var_path):
-		property = var_path # the property is in the local scope
-		obj_name = ""
-	else:
-		obj_name = DialogueScript.ident_head(var_path)
-		property =  DialogueScript.get_property_path(var_path)
 
 	var value := Expression.new()
 	var err := value.parse(line.val[1], resource._script_map.keys())
 	if err != OK:
 		throw_error("Expression parse error: '" + value.get_error_text()+ "'", line)
-	resource.lines.append(DialogueLine.Set.new(get_curr_id(), obj_name, property, value, get_curr_data()))
+
+	resource.lines.append(
+		DialogueLine.Set.new(
+			get_curr_id(), 
+			get_obj_name(var_path), 
+			get_property_path(var_path),
+			value,
+			curr_interrupts.values()))
+
 	curr_idx += 1
 
 func parse_execute() -> void:
@@ -291,7 +319,13 @@ func parse_execute() -> void:
 	var err := expr.parse(line.val, resource._script_map.keys())
 	if err != OK:
 		throw_error("Expression parse error: '" + expr.get_error_text()+ "'", line)
-	resource.lines.append(DialogueLine.Execute.new(get_curr_id(), expr, get_curr_data()))
+		
+	resource.lines.append(
+		DialogueLine.Execute.new(
+			get_curr_id(), 
+			expr, 
+			curr_interrupts.values()))
+
 	curr_idx += 1
 
 func is_question() -> bool:
@@ -303,7 +337,14 @@ func is_question() -> bool:
 func parse_question() -> void:
 	var line := tokens[curr_idx]
 	var responses: Array[int] = []
-	resource.lines.append(DialogueLine.Question.new(get_curr_id(), curr_speaker, line.val, responses, get_curr_data()))
+	resource.lines.append(
+		DialogueLine.Question.new(
+			get_curr_id(), 
+			curr_speaker, 
+			line.val, 
+			responses, 
+			curr_interrupts.values()))
+
 	curr_idx += 1
 
 	while curr_idx < len(tokens):
@@ -327,7 +368,12 @@ func parse_response() -> int:
 	var response: String = tokens[curr_idx].val
 	var response_id := get_curr_id()
 	var response_indent := tokens[curr_idx].indent
-	resource.lines.append(DialogueLine.Response.new(get_curr_id(), response, get_curr_data()))
+	resource.lines.append(
+		DialogueLine.Response.new(
+			get_curr_id(), 
+			response, 
+			curr_interrupts.values()))
+			
 	curr_idx += 1
 	
 	while curr_idx < len(tokens) and tokens[curr_idx].indent > response_indent:

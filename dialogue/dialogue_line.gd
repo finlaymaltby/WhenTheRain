@@ -1,79 +1,76 @@
 class_name DialogueLine extends RefCounted
 
-class Data extends RefCounted:
-	## The id of the heading that the line is under
-	var heading: int
-	var interrupts: Dictionary[String, int]
-
-	func _init(_heading: int, _interrupts: Dictionary[String, int]) -> void:
-		heading = _heading
-		interrupts = _interrupts.duplicate()
-
-	func _to_string() -> String:
-		return "/" + str(heading) + "/" + str(interrupts)
+const _DISPLAY_BODY_LEN := 50
 
 var id: int
 var next_id: int
-var data: Data
+var interrupts: Array[Interrupt]
 
-func _init(_id: int, _data: Data) -> void:
+func _init(_id: int, _interrupts: Array[Interrupt]) -> void:
 	id = _id
-	next_id = id+1
-	data = _data
+	next_id = id + 1
+	interrupts = _interrupts
 
 func _to_string() -> String:
-	return str(id) + ": " + str(data)
+	var left :=  "%2d: " % id + __to_string()
 
-class DLabel extends DialogueLine:
+	return left.rpad(_DISPLAY_BODY_LEN, " ") + " (=>" + str(next_id) + ") " + str(interrupts)
+
+func __to_string() -> String:
+	push_error("override")
+	return ""
+
+class Title extends DialogueLine:
 	var name: String
-	func _init(_id: int, _name: String, _data: Data) -> void:
-		id = _id
-		next_id = id+1
-		name = _name
-		data = _data
 
-	func _to_string() -> String:
-		return str(id) + ": " + name + " " + str(data)
+	func _init(_id: int, _name: String, _interrupts: Array[Interrupt]) -> void:
+		id = _id
+		next_id = id + 1
+		name = _name
+		interrupts = _interrupts.duplicate()
+
+	func __to_string() -> String:
+		return "TITLE " + name 
 
 class Turn extends DialogueLine:
 	var speaker: String
 	var text: String
 	var time: int = -1
 
-	func _init(_id: int, _speaker: String, _text: String, _data: Data) -> void:
+	func _init(_id: int, _speaker: String, _text: String, _interrupts: Array[Interrupt]) -> void:
 		id = _id
-		next_id = id+1
+		next_id = id + 1
 		speaker = _speaker
 		text = _text
-		data = _data
+		interrupts = _interrupts
 
-	func _to_string() -> String:
-		return str(id) + ": " + "'" + speaker + "' says '" + text + "' " + str(data)
+	func __to_string() -> String:
+		return "TURN '" + speaker + "' - '" + text + '"'
 
 class Question extends Turn:
 	var responses: Array[int]
 
-	func _init(_id: int, _speaker: String, _text: String, _responses: Array[int],  _data: Data) -> void:
+	func _init(_id: int, _speaker: String, _text: String, _responses: Array[int],  _interrupts: Array[Interrupt]) -> void:
 		id = _id
-		next_id = id+1
+		next_id = id + 1
 		speaker = _speaker
 		text = _text
 		responses = _responses
-		data = _data
+		interrupts = _interrupts
 
-	func _to_string() -> String:
-		return str(id) + ": '" + speaker + "' asks '" + text + "' " + str(responses) + " " + str(data)
+	func __to_string() -> String:
+		return "QUESTION '" +speaker + "' - '" + text + "' " + str(responses)
 
 class Response extends DialogueLine:
 	var text: String
-	func _init(_id: int, _text: String, _data: Data) -> void:
+	func _init(_id: int, _text: String, _interrupts: Array[Interrupt]) -> void:
 		id = _id
-		next_id = id+1
+		next_id = id + 1
 		text = _text
-		data = _data
+		interrupts = _interrupts
 
-	func _to_string() -> String:
-		return str(id) + ": response '" + text + "' " + str(data)
+	func __to_string() -> String:
+		return  "RESPONSE '" + text + "'"
 
 class Mutation extends DialogueLine:
 	func run_mutation(dialogue: Dialogue) -> void:
@@ -89,12 +86,12 @@ class Set extends Mutation:
 	var property: String
 	var value: Expression
 
-	func _init(_id: int, _obj_name: String, _property: String, _value: Expression, _data: Data) -> void:
+	func _init(_id: int, _obj_name: String, _property_path: String, _value: Expression, _interrupts: Array[Interrupt]) -> void:
 		id = _id
-		next_id = id+1
-		data = _data
+		next_id = id + 1
+		interrupts = _interrupts
 		obj_name = _obj_name
-		property = _property
+		property = _property_path
 		value = _value
 
 	func run_mutation(dialogue: Dialogue) -> void:
@@ -106,36 +103,67 @@ class Set extends Mutation:
 			else:
 				obj.set_indexed(property, result)
 
-	func _to_string() -> String:
-		return str(id) + ": SET " + obj_name + ".get(" + property + ") " + " = " + str(value) + str(data)
+	func __to_string() -> String:
+		return "SET " + obj_name + ".(" + property + ") = " + DialogueScript.expr_to_string(value)
 
 class Execute extends Mutation:
 	var expr: Expression
-	func _init(_id: int, _expr: Expression, _data: Data) -> void:
+	func _init(_id: int, _expr: Expression, _interrupts: Array[Interrupt]) -> void:
 		id = _id
 		next_id = id+1
 		expr = _expr
-		data = _data
+		interrupts = _interrupts
 		
 	func run_mutation(dialogue: Dialogue) -> void:
 		var _result = expr.execute(dialogue.object_bindings.values(), dialogue.object_bindings.get("", null))
 		if expr.has_execute_failed():
 			push_error("Execution error '" + expr.get_error_text() + "' in " + str(self))
 
-	func _to_string() -> String:
-		return str(id) + ": EXECUTE " + str(expr) + str(data)
+	func __to_string() -> String:
+		return "EXEC " + DialogueScript.expr_to_string(expr)
 
 				
 class Jump extends DialogueLine:
-	func _init(_id: int, _jump_id: int, _data: Data) -> void:
+	func _init(_id: int, _jump_id: int, _interrupts: Array[Interrupt]) -> void:
 		id = _id
 		
 		next_id = _jump_id
-		data = _data
+		interrupts = _interrupts
 
-	func _to_string() -> String:
-		return str(id) + ": ( => " + str(next_id) + ") " + str(data)
+	func __to_string() -> String:
+		return ""
 
 class JumpRet extends Jump:
 	func _to_string() -> String:
-		return str(id) + ": ( =>< " + str(next_id) + ") " + str(data)
+		return str(id) + ": (=><" + str(next_id) + ")" + str(interrupts)
+
+
+class Interrupt extends RefCounted:
+	var obj_name: String 
+	var signal_path: NodePath 
+	var signal_name: String
+
+	func run_mutation(dialogue: Dialogue) -> void:
+		push_error("override in subclass")
+
+	func _to_string() -> String:
+		return "?" + obj_name + ".(" + str(signal_path) + ")" + __to_string()
+
+	func __to_string() -> String:
+		push_error("override")
+		return ""
+
+class InterruptJump extends Interrupt:
+	var jump_id: int
+	func _init(_obj_name: String, _signal_path: String, _jump_id) -> void:
+		obj_name = _obj_name
+		signal_path = _signal_path
+		jump_id = _jump_id
+
+		signal_name = obj_name + ":" + str(signal_path)
+
+	func run_mutation(dialogue: Dialogue) -> void:
+		dialogue._curr_id = jump_id
+
+	func __to_string() -> String:
+		return "=>" + str(jump_id)
