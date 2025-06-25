@@ -1,6 +1,7 @@
 class_name Dialogue extends Node
 
-var _script_map: Dictionary[String, Object]
+## The corresponding instance of the object referred to by the string name in the file
+var object_bindings: Dictionary[String, Object]
 
 var res: DialogueResource
 
@@ -14,11 +15,11 @@ var _curr_line: DialogueLine:
 
 var curr_turn: DialogueLine.Turn
 
-func _init(resource: DialogueResource, script_map: Dictionary[String, Object]) -> void:
+func _init(resource: DialogueResource, _object_bindings: Dictionary[String, Object]) -> void:
 	res = resource
-	_script_map = script_map
+	object_bindings = _object_bindings
 
-static func compile_from_raw(path: String, _unnamed_inputs: Array[Node], _named_inputs: Dictionary[String, Node]) -> Dialogue:
+static func compile_from_raw(path: String, _unnamed_inputs: Array[Object], _named_inputs: Dictionary[String, Object]) -> Dialogue:
 	var compiler := DialogueCompiler.from_path(path)
 	for obj in _unnamed_inputs:
 		compiler.add_using(obj)

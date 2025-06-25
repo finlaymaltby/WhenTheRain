@@ -1,4 +1,4 @@
-class_name QuickDialogueMenu extends DialogueMenu
+class_name DialogueMenuQuick extends DialogueMenu
 ## dialogue menu that only uses quick response shortcuts (not interact)
 
 func _input(event: InputEvent) -> void:

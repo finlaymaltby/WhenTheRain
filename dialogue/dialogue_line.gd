@@ -80,7 +80,12 @@ class Mutation extends DialogueLine:
 		push_error("Override in subclass")
 
 class Set extends Mutation:
+	## The (aliased) name of the object in the file scope.
+	## e.g. 'pe', 'Gobal', OR "" if a property of the local scope
 	var obj_name: String
+
+	## String NodePath of the property
+	## e.g. "state:body:position"
 	var property: String
 	var value: Expression
 
@@ -93,17 +98,34 @@ class Set extends Mutation:
 		value = _value
 
 	func run_mutation(dialogue: Dialogue) -> void:
-		var obj: Object = dialogue._script_map.get(obj_name, null)
+		var obj: Object = dialogue.object_bindings.get(obj_name, null)
 		if obj:
-			var result = value.execute([], dialogue._script_map.get("", null))
+			var result = value.execute(dialogue.object_bindings.values(), dialogue.object_bindings.get("", null))
 			if value.has_execute_failed():
-				push_error("value execution failed on: ", str(self))
+				push_error("Execution error '" + value.get_error_text() + "' in " + str(self))
 			else:
-				obj.set(property, result)
+				obj.set_indexed(property, result)
 
 	func _to_string() -> String:
 		return str(id) + ": SET " + obj_name + ".get(" + property + ") " + " = " + str(value) + str(data)
 
+class Execute extends Mutation:
+	var expr: Expression
+	func _init(_id: int, _expr: Expression, _data: Data) -> void:
+		id = _id
+		next_id = id+1
+		expr = _expr
+		data = _data
+		
+	func run_mutation(dialogue: Dialogue) -> void:
+		var _result = expr.execute(dialogue.object_bindings.values(), dialogue.object_bindings.get("", null))
+		if expr.has_execute_failed():
+			push_error("Execution error '" + expr.get_error_text() + "' in " + str(self))
+
+	func _to_string() -> String:
+		return str(id) + ": EXECUTE " + str(expr) + str(data)
+
+				
 class Jump extends DialogueLine:
 	func _init(_id: int, _jump_id: int, _data: Data) -> void:
 		id = _id

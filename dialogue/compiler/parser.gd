@@ -151,11 +151,9 @@ func parse_imports() -> void:
 			DLexer.LineType.REQUIRE_USING:
 				var script := find_script(line.val as String, line)
 				add_names(line.val, script, false, line)
-				resource.add_require(script, line.val)
-				var err := resource.add_using(script)
+				var err := resource.add_require_using(script)
 				if err:
 					throw_error(err, line)
-
 			_:
 				body_start = i
 				return
@@ -228,6 +226,8 @@ func parse_simple_line() -> bool:
 			curr_idx += 1
 		DLexer.LineType.SET:
 			parse_set()
+		DLexer.LineType.EXECUTE:
+			parse_execute()
 		DLexer.LineType.JUMP:
 			resource.lines.append(DialogueLine.Jump.new(get_curr_id(), get_label_id(line.val), get_curr_data()))
 			curr_idx += 1
@@ -272,19 +272,27 @@ func parse_set() -> void:
 	var obj_name: String
 
 	if DialogueScript.is_ident(var_path):
-		property = var_path
+		property = var_path # the property is in the local scope
 		obj_name = ""
 	else:
-		obj_name = DialogueScript.ident_init(var_path)
-		property =  DialogueScript.ident_last(var_path)
+		obj_name = DialogueScript.ident_head(var_path)
+		property =  DialogueScript.get_property_path(var_path)
 
 	var value := Expression.new()
-	var err := value.parse(line.val[1], [])
+	var err := value.parse(line.val[1], resource._script_map.keys())
 	if err != OK:
-		throw_error("expression parse error: '" + value.get_error_text()+ "'", line)
+		throw_error("Expression parse error: '" + value.get_error_text()+ "'", line)
 	resource.lines.append(DialogueLine.Set.new(get_curr_id(), obj_name, property, value, get_curr_data()))
 	curr_idx += 1
 
+func parse_execute() -> void:
+	var line := tokens[curr_idx]
+	var expr := Expression.new()
+	var err := expr.parse(line.val, resource._script_map.keys())
+	if err != OK:
+		throw_error("Expression parse error: '" + expr.get_error_text()+ "'", line)
+	resource.lines.append(DialogueLine.Execute.new(get_curr_id(), expr, get_curr_data()))
+	curr_idx += 1
 
 func is_question() -> bool:
 	if tokens[curr_idx].type != DLexer.LineType.TURN or curr_idx+1 == len(tokens):

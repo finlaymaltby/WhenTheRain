@@ -2,7 +2,7 @@
 
 [ext_resource type="Theme" uid="uid://bpeymwg5tqo4p" path="res://ui/assets/default_dark.tres" id="1_rvugb"]
 [ext_resource type="Script" uid="uid://dk3e3xktli8c3" path="res://ui/dialogue/scripts/auto_balloon.gd" id="2_rvugb"]
-[ext_resource type="PackedScene" uid="uid://ckvgyvclnwggo" path="res://addons/dialogue_manager/dialogue_label.tscn" id="3_xjy7h"]
+[ext_resource type="Script" uid="uid://defbcvafcq5ln" path="res://ui/dialogue/scripts/dialogue_label.gd" id="3_rvugb"]
 [ext_resource type="Script" uid="uid://c57q0myli3wir" path="res://ui/dialogue/scripts/quick_response_menu.gd" id="4_rvugb"]
 
 [node name="Balloon" type="Control"]
@@ -61,14 +61,15 @@ alignment = 1
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/DialogueContainer"]
 layout_mode = 2
 
-[node name="DialogueLabel" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/DialogueContainer" instance=ExtResource("3_xjy7h")]
+[node name="DialogueLabel" type="RichTextLabel" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/DialogueContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 2
-text = "asdlfjadsflasjf alskdfj
-asdf"
-seconds_per_step = 0.03
+text = "asdflkadjsf aslkdfj"
+fit_content = true
+scroll_active = false
+script = ExtResource("3_rvugb")
+metadata/_custom_type_script = "uid://defbcvafcq5ln"
 
 [node name="ResponseMenu" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer" node_paths=PackedStringArray("button_template")]
 unique_name_in_owner = true
@@ -77,6 +78,7 @@ layout_mode = 2
 size_flags_vertical = 10
 script = ExtResource("4_rvugb")
 button_template = NodePath("Option1")
+metadata/_custom_type_script = "uid://c57q0myli3wir"
 
 [node name="Option1" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/ResponseMenu"]
 visible = false

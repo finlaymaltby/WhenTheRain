@@ -22,7 +22,6 @@ static func from_path(path: String) -> DialogueCompiler:
 		return null
 	var parser := DParser.new(lexer.tokens)
 	parser.parse()
-	parser.display_debug()
 	if not parser.was_successful:
 		return null
 	return DialogueCompiler.new(parser.resource)
@@ -49,9 +48,9 @@ func compile() -> Dialogue:
 		var global_name := res._global_imports[global]
 		for child in root.get_children():
 			if is_instance_of(child, global):
-				dialogue._script_map[global_name] = child
+				dialogue.object_bindings[global_name] = child
 
-		if not dialogue._script_map.has(global_name):
+		if not dialogue.object_bindings.has(global_name):
 			throw_error("Could not find autoload '" + global_name + "' in the scene tree")
 
 	for script in res._required_objects:
@@ -62,25 +61,25 @@ func compile() -> Dialogue:
 				throw_error("Require '" + script_name + "' to be a valid instance of " + script.resource_path)
 				return
 			else:
-				dialogue._script_map[script_name] = _named_inputs.get(script_name)
+				dialogue.object_bindings[script_name] = _named_inputs.get(script_name)
 				_named_inputs.erase(script_name)
 				continue
 		
 		for unnamed in _unnamed_inputs:
 			if is_instance_of(unnamed, script):
-				if dialogue._script_map.has(script_name) and dialogue._script_map.get(script_name) == unnamed:
+				if dialogue.object_bindings.has(script_name) and dialogue.object_bindings.get(script_name) == unnamed:
 					throw_error("Ambigious input for '" + script_name)
-				dialogue._script_map[script_name] = unnamed
+				dialogue.object_bindings[script_name] = unnamed
 
-		if not dialogue._script_map.has(script_name):
+		if not dialogue.object_bindings.has(script_name):
 			throw_error("Could not find '" + script_name + "' of type " + script.resource_path + " in inputs")
 
 	if res._using_object:
 		for unnamed in _unnamed_inputs:
 			if is_instance_of(unnamed, res._using_object):
-				if dialogue._script_map.has("") and dialogue._script_map.get("", unnamed) == unnamed:
+				if dialogue.object_bindings.has("") and dialogue.object_bindings.get("", unnamed) == unnamed:
 					throw_error("Ambigious input for '" + str(res._using_object) + "'")
-				dialogue._script_map[""] = unnamed
+				dialogue.object_bindings[""] = unnamed
 
 		if not dialogue.using_object:
 			throw_error("Could not find using required object '" + str(res._using_object) + "'")

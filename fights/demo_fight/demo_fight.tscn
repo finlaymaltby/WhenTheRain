@@ -1,10 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://mnh4vgsllx7h"]
+[gd_scene load_steps=8 format=3 uid="uid://mnh4vgsllx7h"]
 
 [ext_resource type="PackedScene" uid="uid://bnp6wfs0hn3by" path="res://ui/dialogue/scenes/auto_balloon.tscn" id="1_10o0n"]
 [ext_resource type="Texture2D" uid="uid://cfbf1yppvx5da" path="res://fights/demo_fight/StonySideView.png" id="3_k1oqk"]
 [ext_resource type="PackedScene" uid="uid://dblhihf157xkn" path="res://entities/player/combat/player_combat.tscn" id="4_pi853"]
 [ext_resource type="PackedScene" uid="uid://q8eiedgcs38p" path="res://entities/angry_guy/combat/combat_angry_guy.tscn" id="6_10o0n"]
-[ext_resource type="Resource" uid="uid://btobqjhtrblyk" path="res://fights/demo_fight/demo_fight.dialogue" id="6_kyqyg"]
 [ext_resource type="Script" uid="uid://cebap58cylrqv" path="res://ui/health_display.gd" id="7_l2t7t"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_o10rv"]
@@ -12,7 +11,7 @@
 [sub_resource type="LabelSettings" id="LabelSettings_3fpli"]
 font_size = 32
 
-[node name="SideOn" type="Node2D"]
+[node name="DemoFight" type="Node2D"]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -35,7 +34,7 @@ motion_mode = 0
 [node name="AngryGuy" parent="." node_paths=PackedStringArray("enemy", "balloon") instance=ExtResource("6_10o0n")]
 position = Vector2(346, 597)
 enemy = NodePath("../SidePlayer")
-dialogue = ExtResource("6_kyqyg")
+dialogue_path = "res://fights/demo_fight/demo_fight_dialogue.txt"
 balloon = NodePath("../CanvasLayer/Balloon")
 
 [node name="HealthDisplay" type="Label" parent="." node_paths=PackedStringArray("character")]

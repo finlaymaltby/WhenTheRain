@@ -9,7 +9,7 @@ var _global_imports: Dictionary[Script, String]
 ## List of required scripts with an alias. An instance of each must be given. 
 var _required_objects: Dictionary[Script, String]
 
-## String name of the object name to the script 
+## String name of the object name to the script it must inherit from
 var _script_map: Dictionary[String, Script]
 
 ## script of the using object
@@ -49,10 +49,12 @@ func add_script(name: String, script: Script) -> void:
 	_script_map[name] = script
 
 ## returns an error
-func add_using(script: Script) -> String:
+func add_require_using(script: Script) -> String:
 	if _using_object and _using_object != script:
 		return "Cannot 'require using' two different objects in the same file"
-	return ""
+
+	return add_require(script, "")
+	
 func display_debug() -> void:
 	print(_global_imports)
 	print(_required_objects)

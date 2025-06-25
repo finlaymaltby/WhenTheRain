@@ -32,6 +32,8 @@ class Line extends RefCounted:
 				string += 'CHARACTER "' + val + '"'
 			LineType.SET:
 				string += "SET ||" + str(val[0]) + "|| = " + str(val[1])
+			LineType.EXECUTE:
+				string += 'EXECUTE "' + str(val) + '"'
 			LineType.JUMP:
 				string += "JUMP |" + str(val) + "|"
 			LineType.JUMP_RET:
@@ -54,6 +56,7 @@ enum LineType {
 	LABEL,
 	CHARACTER,
 	SET,
+	EXECUTE,
 	
 	JUMP,
 	JUMP_RET,
@@ -169,8 +172,13 @@ func create_line() -> void:
 		if not consume_once("="):
 			throw_error("Expected equal sign to follow identifier in set statement")
 		skip_spaces()
-		var string := consume_string()
-		make_line(LineType.SET, [ident, string])
+		var expr := consume_string()
+		make_line(LineType.SET, [ident, expr])
+
+	elif consume_once("!"):
+		skip_spaces()
+		var expr := consume_string()
+		make_line(LineType.EXECUTE, expr)
 
 	elif consume_once("=><"):
 		skip_spaces()

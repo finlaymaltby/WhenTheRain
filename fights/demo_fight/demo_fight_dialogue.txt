@@ -1,0 +1,12 @@
+require using CombatDemoAngryGuy
+require pe as PEvent
+
+== START ==
+* Guy
+$ is_prepped = false
+Hello I am evil Guy
+! print(pe.state.body)
+I am evilling it
+I am evilling it so good
+$ is_prepped = true
+! print(is_prepped)
