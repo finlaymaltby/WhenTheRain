@@ -21,6 +21,8 @@ GET RID OFO ALL STATIC FUNC FROM. REMOVE PRINTS AND BREAKPOOINT S
 investigate abstract classes
 find . -type f -name '*.gd' -not -path './addons/*' -print0 | xargs -0 cat | wc
 
+Dialogue balloon
+- waiting for auto advance should be done by the dialogue label
 
 should just write my own dialogue system at this point
 - add ifs

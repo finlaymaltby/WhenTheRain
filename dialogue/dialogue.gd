@@ -44,6 +44,8 @@ static func from_path(path: String) -> Dialogue:
 	var compiler := DialogueCompiler.from_path(path)
 	return compiler.compile()
 
+## Set the dialogue to begin at the given label
+## Call next
 func start_at(label: String) -> void:
 	if not has_label(label):
 		return 
@@ -53,21 +55,21 @@ func next() -> void:
 	if is_finished():
 		return
 	
-	run_until_turn()
+	_run_until_turn()
 
-func run() -> void:
-	_curr_id = _curr_line.next_id
-
-	if _curr_line is DialogueLine.Mutation:
-		await _curr_line.run_mutation(self)
-
-func run_until_turn() -> void:
+func _run_until_turn() -> void:
 	while not is_finished():
-		run()
+		_run()
 
 		if _curr_line is DialogueLine.Turn:
 			curr_turn = _curr_line
-			return 
+			return
+
+func _run() -> void:
+	_curr_id = _curr_line.next_id
+
+	if _curr_line is DialogueLine.Mutation:
+		await _curr_line.run_mutation(self) 
 
 func get_responses() -> Array[DialogueLine.Response]:
 	if not curr_turn is DialogueLine.Question:
