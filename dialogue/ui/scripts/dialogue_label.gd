@@ -6,12 +6,9 @@ var turn: DialogueLine.Turn:
 	set(val):
 		turn = val
 		text = ""
-		is_finished_typing = false
 
 var delay: float = 0.01
 var is_typing := false
-var is_finished_typing := false
-
 var _waiting_seconds: float = 0
 
 func start_typing() -> void:
@@ -37,11 +34,9 @@ func _type_next() -> void:
 		return
 	text += turn.text[len(text)]
 
-
 func skip_typing() -> void:
 	text = turn.text
 	
 func finish() -> void:
 	is_typing = false
-	is_finished_typing = true
 	finished_typing.emit()

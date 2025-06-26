@@ -17,8 +17,7 @@ config/features=PackedStringArray("4.4", "Forward Plus")
 [autoload]
 
 GlobalStory="*res://utils/autoloads/global_story.gd"
-DialogueUtils="*res://utils/autoloads/dialogue_utils.gd"
-DialogueScript="*res://dialogue/dialogue_script.gd"
+DialogueStdLib="*res://dialogue/dialogue_stdlib.gd"
 
 [debug]
 

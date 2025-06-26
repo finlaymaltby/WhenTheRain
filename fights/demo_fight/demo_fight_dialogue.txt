@@ -1,25 +1,45 @@
+import stdlib
 require using CombatDemoAngryGuy
 require pe as PEvent
 
 == START ==
 ? enemy_very_close.firing => EVILING
+? enemy_very_close.firing => VERY_CLOSE_UNEASY
+? enemy_hit.firing => HIT_THEM
 * Guy
-$ is_prepped = false
-Hello I am evil Guy
-I am evilling it
-! print(is_prepped)
-I am evilling it so good
-$ is_prepped = true
-
+Hello friend
+How are you
+Let's have a chat at a nice distance
+No need to get too close or anything
+~ small_talk
+So how's your day ig
 More liens
 ore lines 2
 more lines 3 
 more lines 4
+I'm going to procedurally loop my dialogue now
+=> small_talk
+
+== CLOSE_UNEASY == 
+? enemy_very_close.firing => VERY_CLOSE_UNEASY
+Hey no need to get so close okay mate
+I'm practising with my sword here
+Can you move back and give me some space
+= agreed
 
 
-== EVILING ==
-* Guy
-Kaboom you are exploding now
-caoom
+== VERY_CLOSE_UNEASY == 
+WOAH WAOH GET BACK
+N
 
 
+== HIT_THEM == 
+OH NO I'VE HIT YOU I'M SO SORRY PLEASE FORGIVE ME
+:(
+:(
+
+
+== EVILING == 
+Hello I am evil Guy
+I am evilling it
+I am evilling it so good

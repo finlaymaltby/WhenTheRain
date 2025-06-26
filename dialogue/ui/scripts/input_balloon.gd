@@ -1,19 +1,23 @@
 class_name InputBalloon extends DialogueBalloon
 ## A dialogue balloon that uses player input to advance
 
+func _start_waiting() -> void:
+	waiting_for = PLAYER_INPUT
+
 func _input(event: InputEvent) -> void:
-	if not visible: return
-	if response_menu.visible: return
+	if not visible or waiting_for == RESPONSE_SELECTED: 
+		return
 
 	if event.is_action_released("interact"):
 		get_viewport().set_input_as_handled()
 
 	if event.is_action_released("cancel") and dialogue_label.is_typing:
 		get_viewport().set_input_as_handled()
-		skip()
+		skip_typing()
 
-	if not is_waiting: return 
+	if waiting_for in [PLAYER_INPUT, EOL_AUTO_ADVANCE]:
+		if event.is_action_released("interact"):
+			_start_next_line()
+	 
 
-	if event.is_action_released("interact"):
-		next()
 	

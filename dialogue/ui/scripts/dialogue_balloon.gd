@@ -18,13 +18,15 @@ var dialogue: Dialogue
 ## Timer for waiting for auto-advance at the end of lines
 var eol_wait: Timer = Timer.new()
 
-var waiting_for: WaitMode
+var waiting_for: int
 
 enum {
-	LABEL_TYPING,
-	RESPONSE_SELECTING,
+	LABEL_TYPED,
+	RESPONSE_SELECTED,
 	EOL_AUTO_ADVANCE,
-	PLAYER_INPUT
+	PLAYER_INPUT,
+	NOT_WAITING,
+	FINISHED
 }
 
 func _ready() -> void:
@@ -39,7 +41,13 @@ func _ready() -> void:
 	if not response_menu.response_selected.is_connected(_on_responses_menu_response_selected):
 		response_menu.response_selected.connect(_on_responses_menu_response_selected)
 
-## Start some dialogue
+	dialogue_label.finished_typing.connect(_on_label_finished_typing)
+
+func _process(delta: float) -> void:
+	if dialogue.is_finished():
+		finish()
+
+## Start some dialogue from the given title
 func start(_dialogue: Dialogue, title: String) -> void:
 	dialogue = _dialogue
 
@@ -51,80 +59,51 @@ func start(_dialogue: Dialogue, title: String) -> void:
 
 	dialogue.start_at(title)
 	set_process(true)
+	_start_next_line()
 
-func start_next_line():
-	dialogue.next()
-	waiting_for = LABEL_TYPING
-	dialogue_label.start_typing_from(dialouge.curr_turn)
-
-func _process(delta: float) -> void:
-	if dialogue.is_finished():
-		finish()
-
-func handle_advance() -> void:
-	# waiting for the response menu
-	if response_menu.visible:
-		return
-
-	# waiting for 
-	if line_wait.time_left != 0:
-		return
-
+func _start_next_line():
+	dialogue.next_turn()
 	var turn := dialogue.curr_turn
-
-	if turn is DialogueLine.Question:
-		response_menu.responses = dialogue.get_responses()
-		response_menu.show()
-	elif turn.time == 0:
-		dialogue.next()
-	elif turn.time != -1:
-		line_wait.start(turn.time)
-	else:
-		start_waiting()
-
-## Apply any changes to the balloon given a new [DialogueLine].
-func apply_turn() -> void:
-	is_waiting = false
-
-	hide()
-	var turn := dialogue.curr_turn
-
+	show()
+	waiting_for = LABEL_TYPED
 	character_label.visible = not turn.speaker.is_empty()
 	character_label.text = turn.speaker
 	response_menu.hide()
-	dialogue_label.turn = turn
+	dialogue_label.start_typing_from(turn)
 
-	show()
+func _handle_advance() -> void:
+	var turn := dialogue.curr_turn
 
-	if not turn.text.is_empty():
-		dialogue_label.start_typing()
-		await dialogue_label.finished_typing
+	if turn is DialogueLine.Question:
+		waiting_for = RESPONSE_SELECTED
+		response_menu.responses = dialogue.get_responses()
+		response_menu.show()
+	elif turn.time == 0:
+		_start_next_line()
+	elif turn.time > 0:
+		waiting_for = EOL_AUTO_ADVANCE
+		eol_wait.start(turn.time)
+	else:
+		_start_waiting()
 
-	if dialogue.is_finished():
-		finish()
-		return
-		
+## What to do when waiting when need an exernal signal to advance to next line.
+## e.g. player input, forced auto advance, etc.
+func _start_waiting() -> void:
+	push_error("override in subclass")
 
-## extra things to do when waiting (e.g. autostart next line)
-func start_waiting() -> void:
-	is_waiting = true
+## Call to skip the readout typing
+func skip_typing() -> void:
+	if waiting_for == LABEL_TYPED:
+		dialogue_label.skip_typing()
+	else:
+		breakpoint
 
-func next() -> void:
-	is_waiting = false
-	dialogue.next()
-	apply_turn()
-
-## Call to skip the readout
-func skip() -> void:
-	dialogue_label.skip_typing()
-
-## when there are no lines left in the dialogue dialogue
+## When the dialogue reaches END
 func finish() -> void:
+	waiting_for = FINISHED
 	set_process(false)
 	dialogue.interrupted.disconnect(_on_dialogue_interrupted)
-
 	dialogue = null
-	is_waiting = false
 	hide()
 	response_menu.finish()
 	finished.emit()
@@ -134,10 +113,9 @@ func jump(title: String) -> void:
 	if not dialogue.has_label(title):
 		push_error("dialogue doesn't have the title you wanna jump to: ", title)
 	
-	is_waiting = false
-	response_menu.responses = []
-	dialogue_label.skip_typing()
-	line_wait.timeout.emit()
+	_interrupt_waiters()
+	dialogue.start_at(title)
+	_start_next_line()
 
 ## Only makes the jump if the current dialogue is the one you're trying to jump in
 func jump_checked(title: String, _dialogue: Dialogue) -> void:
@@ -146,25 +124,27 @@ func jump_checked(title: String, _dialogue: Dialogue) -> void:
 	jump(title)
 
 func leave() -> void:
-	if dialogue.has_label("on_leave"):
-		jump("on_leave")
-	else:
-		dialogue.jump_end()
-		next()
+	jump("_on_leave" if dialogue.has_label("_on_leave") else "END")
 
 func _on_label_finished_typing():
-	if not waiting_for == LABEL_TYPING:
-		return
-	
-	
+	if waiting_for == LABEL_TYPED:
+		_handle_advance()
 
 func _on_responses_menu_response_selected(response: DialogueLine.Response) -> void:
-	dialogue.pick_response(response)
-	next()
-
-func _on_dialogue_interrupted() -> void:
-	skip()
-	apply_turn()
+	if waiting_for == RESPONSE_SELECTED:
+		dialogue.pick_response(response)
+		_start_next_line()
 
 func _on_eol_wait_timeout() -> void:
-	dialogue.next()
+	if waiting_for == EOL_AUTO_ADVANCE:
+		_start_next_line()
+
+func _interrupt_waiters() -> void:
+	waiting_for = NOT_WAITING
+	dialogue_label.skip_typing()
+	response_menu.finish()
+	eol_wait.timeout.emit()
+
+func _on_dialogue_interrupted() -> void:
+	_interrupt_waiters()
+	_start_next_line()

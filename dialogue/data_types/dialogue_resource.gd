@@ -22,12 +22,13 @@ static func empty() -> DialogueResource:
 	return res
 
 func _init() -> void:
+
 	lines = []
 	_global_imports = {}
 	_required_objects = {}
 	_script_map = {}
 
-	labels = {"END": DialogueScript.ID_END}
+	labels = {"END": Dialogue.ID_END}
 
 ## Returns an error message
 func add_global(global: Script, name: String) -> String:

@@ -104,7 +104,7 @@ class Set extends Mutation:
 				obj.set_indexed(property, result)
 
 	func __to_string() -> String:
-		return "SET " + obj_name + ".(" + property + ") = " + DialogueScript.expr_to_string(value)
+		return "SET " + obj_name + ".(" + property + ") = " + Dialogue._expr_to_string(value)
 
 class Execute extends Mutation:
 	var expr: Expression
@@ -120,7 +120,7 @@ class Execute extends Mutation:
 			push_error("Execution error '" + expr.get_error_text() + "' in " + str(self))
 
 	func __to_string() -> String:
-		return "EXEC " + DialogueScript.expr_to_string(expr)
+		return "EXEC " + Dialogue._expr_to_string(expr)
 
 				
 class Jump extends DialogueLine:

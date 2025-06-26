@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bqxb15udwi07" path="res://entities/player/explore/player.tscn" id="2_ul47n"]
 [ext_resource type="PackedScene" uid="uid://ck633mt16j2wm" path="res://entities/dummy/explore/dummy.tscn" id="3_qsyir"]
 [ext_resource type="Script" uid="uid://d1uufrolkpbqn" path="res://utils/components/interactable.gd" id="4_f2jw5"]
-[ext_resource type="PackedScene" uid="uid://c8rr8smgvfjk4" path="res://ui/dialogue/scenes/default_balloon.tscn" id="7_lvddk"]
+[ext_resource type="PackedScene" uid="uid://c8rr8smgvfjk4" path="res://dialogue/ui/scenes/default_balloon.tscn" id="7_lvddk"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lvddk"]
 radius = 83.006

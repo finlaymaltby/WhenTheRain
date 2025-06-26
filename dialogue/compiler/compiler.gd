@@ -1,5 +1,10 @@
 class_name DialogueCompiler extends Node
 
+const SCRIPT_ALIASES: Dictionary[String, String]= {
+	"stdlib": "DialogueStdLib",
+	"StdLib": "DialogueStdLib"
+}
+
 var res: DialogueResource
 var dialogue: Dialogue
 var was_successful: bool 

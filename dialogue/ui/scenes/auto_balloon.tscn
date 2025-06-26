@@ -1,9 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://c8rr8smgvfjk4"]
+[gd_scene load_steps=5 format=3 uid="uid://bnp6wfs0hn3by"]
 
-[ext_resource type="Script" uid="uid://dutbdcy34iibi" path="res://ui/dialogue/scripts/input_balloon.gd" id="2_0xicv"]
-[ext_resource type="Theme" uid="uid://bpeymwg5tqo4p" path="res://ui/assets/default_dark.tres" id="2_6adan"]
-[ext_resource type="Script" uid="uid://defbcvafcq5ln" path="res://ui/dialogue/scripts/dialogue_label.gd" id="3_0xicv"]
-[ext_resource type="Script" uid="uid://b2nfu7y6mgk4n" path="res://ui/dialogue/scripts/response_menu.gd" id="3_gx3xm"]
+[ext_resource type="Theme" uid="uid://bpeymwg5tqo4p" path="res://ui/assets/default_dark.tres" id="1_rvugb"]
+[ext_resource type="Script" uid="uid://dk3e3xktli8c3" path="res://dialogue/ui/scripts/auto_balloon.gd" id="2_rvugb"]
+[ext_resource type="Script" uid="uid://defbcvafcq5ln" path="res://dialogue/ui/scripts/dialogue_label.gd" id="3_rvugb"]
+[ext_resource type="Script" uid="uid://c57q0myli3wir" path="res://dialogue/ui/scripts/quick_response_menu.gd" id="4_rvugb"]
 
 [node name="Balloon" type="Control"]
 layout_mode = 3
@@ -12,9 +12,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("2_6adan")
-script = ExtResource("2_0xicv")
-metadata/_custom_type_script = "uid://dutbdcy34iibi"
+theme = ExtResource("1_rvugb")
+script = ExtResource("2_rvugb")
+metadata/_custom_type_script = "uid://dk3e3xktli8c3"
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -48,7 +48,7 @@ unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0.501961)
 layout_mode = 2
 mouse_filter = 1
-theme = ExtResource("2_6adan")
+theme = ExtResource("1_rvugb")
 bbcode_enabled = true
 text = "Character"
 fit_content = true
@@ -65,12 +65,10 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
-bbcode_enabled = true
-text = "alsdfkjasdlfk;ajsdfl;kajsdf
-asdlfadsfasdf"
+text = "asdflkadjsf aslkdfj"
 fit_content = true
-script = ExtResource("3_0xicv")
+scroll_active = false
+script = ExtResource("3_rvugb")
 metadata/_custom_type_script = "uid://defbcvafcq5ln"
 
 [node name="ResponseMenu" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer" node_paths=PackedStringArray("button_template")]
@@ -78,8 +76,9 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_vertical = 10
-script = ExtResource("3_gx3xm")
+script = ExtResource("4_rvugb")
 button_template = NodePath("Option1")
+metadata/_custom_type_script = "uid://c57q0myli3wir"
 
 [node name="Option1" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/ResponseMenu"]
 visible = false

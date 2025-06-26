@@ -40,7 +40,7 @@ func parse() -> DialogueResource:
 	
 	while curr_idx < len(tokens) and tokens[curr_idx].type == DLexer.LineType.HEADING:
 		parse_heading_block()
-		resource.lines[-1].next_id = DialogueScript.ID_END
+		resource.lines[-1].next_id = Dialogue.ID_END
 
 	check_indentation()
 	return resource
@@ -86,10 +86,10 @@ func find_script(name: String, line: DLexer.Line) -> Script:
 	var base_script: Script = null
 
 	for class_dict in ProjectSettings.get_global_class_list():
-		if class_dict.get("class") == DialogueScript.ident_head(name):
+		if class_dict.get("class") == Dialogue._ident_head(name):
 			base_script = load(class_dict.path)
 	if not base_script:
-		throw_error("Couldn't find class '" + DialogueScript.ident_head(name) + "' in the global namespace", line)
+		throw_error("Couldn't find class '" + Dialogue._ident_head(name) + "' in the global namespace", line)
 		return null
 		
 	var names := name.split(".")
@@ -171,7 +171,7 @@ func get_obj_name(name: String) -> String:
 	if not valid_name(name):
 		throw_error("Cannot access object of invalid name")
 
-	var head := DialogueScript.ident_head(name)
+	var head := Dialogue._ident_head(name)
 
 	if head in resource._script_map.keys():
 		return head
@@ -182,7 +182,7 @@ func get_property_path(name: String) -> String:
 	if not valid_name(name):
 		throw_error("Cannot access property path of invalid name")
 
-	var head := DialogueScript.ident_head(name)
+	var head := Dialogue._ident_head(name)
 
 	if head in resource._script_map.keys():
 		return (name.replace(".", ":") as NodePath).get_concatenated_subnames()
@@ -200,7 +200,7 @@ func get_label_id(name: String) -> int:
 			id += 1
 	
 	if name == "END":
-		return DialogueScript.ID_END
+		return Dialogue.ID_END
 	throw_error("Could not find label '" + name + "' in the file", tokens[curr_idx])
 	return -1
 

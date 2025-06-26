@@ -1,5 +1,24 @@
 class_name Dialogue extends Node
 
+#region utils
+
+const ID_END: int = -1
+const AUTO_WAIT_TIME: float = 1
+
+static func _is_ident(s: String) -> bool:
+	return s.is_valid_ascii_identifier()
+
+static func _ident_head(ident: String) -> String:
+	return ident.split(".")[0]
+
+static func _ident_last(ident: String) -> String:
+	return ident.split(".")[-1]
+
+static func _expr_to_string(expr: Expression) -> String:
+	return "EXPR"
+
+#endregion
+
 signal interrupted
 
 ## The corresponding instance of the object referred to by the string name in the file
@@ -45,13 +64,13 @@ static func from_path(path: String) -> Dialogue:
 	return compiler.compile()
 
 ## Set the dialogue to begin at the given label
-## Call next
+## Call next_turn
 func start_at(label: String) -> void:
 	if not has_label(label):
 		return 
 	_curr_id = res.labels[label]
 
-func next() -> void:
+func next_turn() -> void:
 	if is_finished():
 		return
 	
@@ -84,17 +103,16 @@ func get_responses() -> Array[DialogueLine.Response]:
 	return responses
 
 func pick_response(response: DialogueLine.Response) -> void:
-	print(response)
 	_curr_id = response.id
 
 func has_label(title: String) -> bool:
 	return title in res.labels
 
 func jump_end() -> void:
-	_curr_id = DialogueScript.ID_END
+	_curr_id = Dialogue.ID_END
 
 func is_finished() -> bool:
-	return _curr_id >= len(res.lines) or _curr_id == DialogueScript.ID_END
+	return _curr_id >= len(res.lines) or _curr_id == Dialogue.ID_END
 
 func update_interrupts(next_id: int) -> void:
 	for interrupt in _curr_interrupts:

@@ -29,4 +29,4 @@ should just write my own dialogue system at this point
 - Fix messed up naming system, alias, name, ident, q ident, 
 - fix title, label, heading messy names
 - refactor parser to use a property map. Check for namesapce collisions
-- consider getting user to write . before using lcoa vr
+- Add global signal jumps
