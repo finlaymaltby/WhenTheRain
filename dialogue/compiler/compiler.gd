@@ -48,7 +48,7 @@ func throw_error(msg: String) -> void:
 func compile() -> Dialogue:
 	_add_globals()
 	_add_required_objects()
-	if res._using_object:
+	if res._open_object:
 		_add_using_object()
 	_verify_interrupt_signals()
 	return dialogue if was_successful else null
@@ -111,20 +111,20 @@ func try_access(obj_name: String, property_path: String, can_be_null := false) -
 func _verify_interrupt_signals() -> void:
 	for line in dialogue.res.lines:
 		for interrupt in line.interrupts:
-			if interrupt.signal_name in dialogue.signal_bindings:
+			if interrupt.signal_path in dialogue.signal_bindings:
 				continue
-			var sig = try_access(interrupt.obj_name, interrupt.signal_path)
+			var sig = try_access(interrupt.obj_name, interrupt.subpath)
 			if not sig is Signal:
-				throw_error("Interrupt signal '" + interrupt.signal_name + "' is not a Signal")
+				throw_error("Interrupt signal '" + interrupt.signal_path + "' is not a Signal")
 			 
-			dialogue.signal_bindings[interrupt.signal_name] = sig as Signal
+			dialogue.signal_bindings[interrupt.signal_path] = sig as Signal
 			_set_signal_arg_count(interrupt)
 
 func _set_signal_arg_count(interrupt: DialogueLine.Interrupt) -> void:
 	var root_obj = dialogue.object_bindings[interrupt.obj_name]
-	var path := interrupt.signal_path
+	var path := interrupt.subpath
 	var signal_parent: Object
-	if interrupt.signal_path.get_subname_count() == 0:
+	if interrupt.subpath.get_subname_count() == 0:
 		signal_parent = root_obj
 	else:
 		var signal_parent_path := path.slice(0, -1).get_as_property_path()
@@ -133,7 +133,7 @@ func _set_signal_arg_count(interrupt: DialogueLine.Interrupt) -> void:
 	var signal_arg_count := -1
 	for signal_data in signal_parent.get_signal_list():
 		
-		if interrupt.signal_name.ends_with(signal_data["name"]):
+		if interrupt.signal_path.ends_with(signal_data["name"]):
 			signal_arg_count = signal_data["args"].size()
 	
 	if signal_arg_count == -1:
@@ -141,4 +141,4 @@ func _set_signal_arg_count(interrupt: DialogueLine.Interrupt) -> void:
 		push_error("Could not find signal")
 		return 
 
-	dialogue._signal_arg_counts[interrupt.signal_name] = signal_arg_count
+	dialogue._signal_arg_counts[interrupt.signal_path] = signal_arg_count

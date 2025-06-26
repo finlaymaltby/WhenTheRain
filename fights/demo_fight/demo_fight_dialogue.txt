@@ -1,6 +1,6 @@
-import stdlib
+import DialogueStdLib
 require using CombatDemoAngryGuy
-require pe as PEvent
+require PEvent as pe
 
 == START ==
 ? enemy_very_close.firing => EVILING
@@ -22,6 +22,7 @@ I'm going to procedurally loop my dialogue now
 
 == CLOSE_UNEASY == 
 ? enemy_very_close.firing => VERY_CLOSE_UNEASY
+* Guy
 Hey no need to get so close okay mate
 I'm practising with my sword here
 Can you move back and give me some space
@@ -29,17 +30,20 @@ Can you move back and give me some space
 
 
 == VERY_CLOSE_UNEASY == 
+* Guys
 WOAH WAOH GET BACK
 N
 
 
 == HIT_THEM == 
+* Guy
 OH NO I'VE HIT YOU I'M SO SORRY PLEASE FORGIVE ME
 :(
 :(
 
 
 == EVILING == 
+* Guy
 Hello I am evil Guy
 I am evilling it
 I am evilling it so good

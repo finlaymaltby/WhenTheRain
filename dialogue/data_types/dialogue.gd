@@ -68,7 +68,7 @@ static func from_path(path: String) -> Dialogue:
 func start_at(label: String) -> void:
 	if not has_label(label):
 		return 
-	_curr_id = res.labels[label]
+	_curr_id = res.titles[label]
 
 func next_turn() -> void:
 	if is_finished():
@@ -106,7 +106,7 @@ func pick_response(response: DialogueLine.Response) -> void:
 	_curr_id = response.id
 
 func has_label(title: String) -> bool:
-	return title in res.labels
+	return title in res.titles
 
 func jump_end() -> void:
 	_curr_id = Dialogue.ID_END
@@ -116,11 +116,11 @@ func is_finished() -> bool:
 
 func update_interrupts(next_id: int) -> void:
 	for interrupt in _curr_interrupts:
-		signal_bindings[interrupt.signal_name].disconnect(_on_interrupt)
+		signal_bindings[interrupt.signal_path].disconnect(_on_interrupt)
 
 	for interrupt in res.lines[next_id].interrupts:
-		var sig := signal_bindings[interrupt.signal_name]
-		var args := _signal_arg_counts[interrupt.signal_name]
+		var sig := signal_bindings[interrupt.signal_path]
+		var args := _signal_arg_counts[interrupt.signal_path]
 		sig.connect(_on_interrupt.bind(interrupt).unbind(args))
 
 	_curr_interrupts = res.lines[next_id].interrupts

@@ -2,6 +2,8 @@ class_name PEvent extends RefCounted
 
 signal firing(event: PEvent)
 
+const chicken := 5
+
 class State extends RefCounted: 
 	signal update
 

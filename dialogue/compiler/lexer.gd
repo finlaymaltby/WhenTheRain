@@ -1,7 +1,7 @@
 class_name DLexer extends RefCounted
 ## DialogueScript lexer. 
 ## Not a conventional lexer because it treats each line as 'token',
-## which is possible because there is no recursion within each line
+## which is possible because there is no recursive structure within each line
 
 class Line extends RefCounted:
 	var type: LineType
@@ -20,8 +20,10 @@ class Line extends RefCounted:
 		match type:
 			LineType.IMPORT:
 				string += "IMPORT ||" + str(val) + "||"
+			LineType.IMPORT_AS:
+				string += "IMPORT ||" + str(val[0]) + "|| AS |" + str(val[1]) + "|"
 			LineType.REQUIRE:
-				string += "REQUIRE |" + str(val[0]) + "| AS ||" + str(val[1]) + "||"
+				string += "REQUIRE ||" + str(val[0]) + "|| AS |" + str(val[1]) + "|"
 			LineType.REQUIRE_USING:
 				string += "REQUIRE USING ||" + str(val) + "||"
 			LineType.HEADING:
@@ -49,6 +51,7 @@ class Line extends RefCounted:
 
 enum LineType {
 	IMPORT,
+	IMPORT_AS,
 	REQUIRE,
 	REQUIRE_USING,
 
@@ -119,36 +122,42 @@ func create_line() -> void:
 	if len(curr_line.strip_edges()) == 0:
 		return
 
-	while consume_indents():
+	while consume_indentation():
 		pass
 		
 	if consume_once("import"):
 		skip_spaces()
-		if consume_once("using"):
-			throw_error("Import using statement not supported at the moment")
-			return
+		var global := consume_ident()
+		if global.is_empty():
+			throw_error("Expected global identifer to follow import keyword")
+		skip_spaces()
+		if consume_once("AS"):
+			skip_spaces()
+			var alias := consume_ident()
+			if alias.is_empty():
+				throw_error("Expected identifier to follow as keyword")
+			make_line(LineType.IMPORT_AS, [global, alias])
 		else:
-			if not make_line_with_ident(LineType.IMPORT):
-				throw_error("Expected identifer to follow import statement")
+			make_line(LineType.IMPORT, global)
 
 	elif consume_once("require"):
 		skip_spaces()
 		if consume_once("using"):
 			skip_spaces()
 			if not make_line_with_qualified_ident(LineType.REQUIRE_USING):
-				throw_error("Expected qualfied identifer to follow import statement")
+				throw_error("Expected qualfied identifer to follow require using keywords")
 		else:
-			var ident := consume_ident()
-			if ident.is_empty():
-				throw_error("Expected identifier to follow require statement")
+			var classname := consume_qualified_ident()
+			if classname.is_empty():
+				throw_error("Expected qualified identifier to follow require keyword")
 			skip_spaces()
 			if not consume_once("as"):
-				throw_error("Expected 'as' keyword to follow identifier in require statement")
+				throw_error("Expected 'as' keyword to follow class name in require statement")
 			skip_spaces()
-			var sig := consume_qualified_ident()
-			if sig.is_empty():
+			var alias := consume_qualified_ident()
+			if alias.is_empty():
 				throw_error("Expected qualified identifer for the classtype in require using statement")
-			make_line(LineType.REQUIRE, [ident, sig])
+			make_line(LineType.REQUIRE, [classname, alias])
 
 	elif consume_once("*"):
 		skip_spaces()
@@ -165,15 +174,15 @@ func create_line() -> void:
 
 	elif consume_once("$"):
 		skip_spaces()
-		var ident := consume_qualified_ident()
-		if ident.is_empty():
+		var lvalue := consume_qualified_ident()
+		if lvalue.is_empty():
 			throw_error("Expected qualified identifier to follow set symbol")
 		skip_spaces()
 		if not consume_once("="):
-			throw_error("Expected equal sign to follow identifier in set statement")
+			throw_error("Expected equal sign to follow lvalue in set statement")
 		skip_spaces()
 		var expr := consume_string()
-		make_line(LineType.SET, [ident, expr])
+		make_line(LineType.SET, [lvalue, expr])
 
 	elif consume_once("!"):
 		skip_spaces()
@@ -197,11 +206,11 @@ func create_line() -> void:
 			throw_error("Expected qualified identifer as signal in interrupt statement")
 		skip_spaces()
 		if not consume_once("=>"):
-			throw_error("Expected jump symbol in interrupt statement")
+			throw_error("Expected jump symbol to follow signal in interrupt statement")
 		skip_spaces()
 		var label = consume_ident()
 		if label.is_empty():
-			throw_error("Expected identifer as label in interrupt statement")
+			throw_error("Expected identifer as label to follow jump symbol in interrupt statement")
 		make_line(LineType.INTERRUPT, [sig, label])
 
 	elif consume_some("="):
@@ -224,8 +233,8 @@ func create_line() -> void:
 func skip_spaces() -> void:
 	curr_line = curr_line.lstrip(" ")
 
-## Consumes any indents at the start of the line given by tabs or spaces
-func consume_indents() -> bool:
+## Consumes any indentation at the start of the line given by tabs or spaces
+func consume_indentation() -> bool:
 	var space_trimmed := curr_line.lstrip(" ")
 	var spaces_removed := curr_line.length() - space_trimmed.length()
 	
@@ -279,16 +288,6 @@ func consume_string() -> String:
 func make_line(type: LineType, val: Variant) -> void:
 	tokens.append(Line.new(type, val, curr_line_num, curr_indent))
 	
-
-## Try to consume an indent and make a line with it as the value
-func make_line_with_ident(type: LineType) -> bool:
-	var ident := consume_ident()
-	if ident.is_empty():
-		return false
-		
-	make_line(type, ident)
-	return true
-
 ## Consumes an identifier from the line and returns it. Returns "" if none is found.
 func consume_ident() -> String:
 	var n: int = 1
@@ -302,7 +301,18 @@ func consume_ident() -> String:
 	curr_line = curr_line.right(-(n-1))
 	return ident
 
-## Consumes a qualified indentifer from the line and returns it
+## Try to consume an indent and make a line with it as the value.
+## Returns true if successful
+func make_line_with_ident(type: LineType) -> bool:
+	var ident := consume_ident()
+	if ident.is_empty():
+		return false
+		
+	make_line(type, ident)
+	return true
+
+## Consumes a qualified indentifer from the line and returns it.
+## Returns "" if unsuccessful
 func consume_qualified_ident() -> String:
 	var qualified_ident := ""
 
@@ -345,5 +355,3 @@ func expect_eol() -> void:
 func display_debug() -> void:
 	for line in tokens:
 		print(line)
-
-		

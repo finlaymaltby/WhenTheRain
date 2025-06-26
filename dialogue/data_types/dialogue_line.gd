@@ -140,14 +140,14 @@ class JumpRet extends Jump:
 
 class Interrupt extends RefCounted:
 	var obj_name: String 
-	var signal_path: NodePath 
-	var signal_name: String
+	var subpath: NodePath 
+	var signal_path: String
 
 	func run_mutation(dialogue: Dialogue) -> void:
 		push_error("override in subclass")
 
 	func _to_string() -> String:
-		return "?" + obj_name + ".(" + str(signal_path) + ")" + __to_string()
+		return "?" + obj_name + ".(" + str(subpath) + ")" + __to_string()
 
 	func __to_string() -> String:
 		push_error("override")
@@ -155,12 +155,12 @@ class Interrupt extends RefCounted:
 
 class InterruptJump extends Interrupt:
 	var jump_id: int
-	func _init(_obj_name: String, _signal_path: String, _jump_id) -> void:
+	func _init(_obj_name: String, _subpath: String, _jump_id) -> void:
 		obj_name = _obj_name
-		signal_path = _signal_path
+		subpath = _subpath
 		jump_id = _jump_id
 
-		signal_name = obj_name + ":" + str(signal_path)
+		signal_path = obj_name + ":" + str(subpath)
 
 	func run_mutation(dialogue: Dialogue) -> void:
 		dialogue._curr_id = jump_id
