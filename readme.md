@@ -25,10 +25,8 @@ Dialogue balloon
 - waiting for auto advance should be done by the dialogue label
 
 should just write my own dialogue system at this point
-- add ifs
 - Fix messed up naming system, alias, name, ident, q ident, 
-- refactor parser to use a property map. Check for namesapce collisions
 - Add global signal jumps
-- Add unit testing
 - title is a label or a heading
-- make it so you can create variables tat 
+- make it so you can create variables in dialogue
+- 
