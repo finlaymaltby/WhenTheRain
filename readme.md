@@ -29,4 +29,4 @@ should just write my own dialogue system at this point
 - Add global signal jumps
 - title is a label or a heading
 - make it so you can create variables in dialogue
-- 
+- heirarchical heading structure?
