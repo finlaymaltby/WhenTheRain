@@ -190,7 +190,7 @@ class Healed extends SignalEvent:
 class EnemyDamaged extends SignalEvent:
 	func _init(_state: State) -> void:
 		super(_state)
-		state.body.health.health_changed.connect(_on_health_change)
+		state.enemy.health.health_changed.connect(_on_health_change)
 	
 	func _on_health_change(change: float) -> void:
 		if change < 0:
@@ -199,7 +199,7 @@ class EnemyDamaged extends SignalEvent:
 class EnemyHealed extends SignalEvent:
 	func _init(_state: State) -> void:
 		super(_state)
-		state.body.health.health_changed.connect(_on_health_change)
+		state.enemy.health.health_changed.connect(_on_health_change)
 	
 	func _on_health_change(change: float) -> void:
 		if change > 0:

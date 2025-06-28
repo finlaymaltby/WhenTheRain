@@ -62,7 +62,7 @@ func start(_dialogue: Dialogue, title: String) -> void:
 	_start_next_line()
 
 func _start_next_line():
-	dialogue.next_turn()
+	await dialogue.next_turn()
 	var turn := dialogue.curr_turn
 	show()
 	waiting_for = LABEL_TYPED

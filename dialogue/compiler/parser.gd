@@ -16,10 +16,15 @@ var opaque_paths: Array[String] = []
 ## The idx of the first heading (i.e. after all the imports)
 var body_start: int
 ## The types of lines that won't becmoe DialogueLines, so they are skipped when calculating line_ids 
-const skipped_line_types := [DLexer.LineType.IMPORT, DLexer.LineType.REQUIRE,
+const skipped_line_types := [DLexer.LineType.IMPORT, DLexer.LineType.IMPORT_AS, DLexer.LineType.REQUIRE,
 							 DLexer.LineType.REQUIRE_USING, DLexer.LineType.CHARACTER, DLexer.LineType.INTERRUPT]
 
 var curr_idx: int
+var curr_line: DLexer.Line:
+	get:
+		return lines[curr_idx]
+
+
 var curr_heading: int
 var curr_interrupts: Dictionary[String, DialogueLine.Interrupt]
 var curr_speaker: String
@@ -36,16 +41,18 @@ func parse() -> DialogueResource:
 	parse_imports()
 	curr_idx = body_start
 	
-	while curr_idx < len(lines) and lines[curr_idx].type == DLexer.LineType.HEADING:
+	while curr_idx < len(lines) and curr_line.type == DLexer.LineType.HEADING:
 		parse_heading_block()
-		resource.lines[-1].next_id = Dialogue.ID_END
+		if resource.lines[-1].next_id_override == Dialogue.ID_UNDEF:
+			resource.lines[-1].next_id_override = Dialogue.ID_END
 
-	check_indentation()
+	validate_indentation()
+	validate_jump_label_ids()
 	return resource
 
 func throw_error(msg: String, line: DLexer.Line = null) -> void:
 	if not line:
-		line = lines[curr_idx]
+		line = curr_line
 
 	push_error('DParser error "', msg, '" found in line ', str(line.line_num), 
 				': "', line, '"')
@@ -200,8 +207,8 @@ func get_label_id(name: String) -> int:
 	
 	if name == "END":
 		return Dialogue.ID_END
-	throw_error("Could not find label '" + name + "' in the file", lines[curr_idx])
-	return -1
+	throw_error("Could not find label '" + name + "' in the file", curr_line)
+	return Dialogue.ID_UNDEF
 
 func valid_name(name: String) -> bool:
 	for opaque in opaque_paths:
@@ -231,48 +238,45 @@ func get_sub_segments(name: String) -> String:
 
 	return name.replace(".", ":")
 
-## Returns whether continue
 func parse_heading_block() -> void:
-	if lines[curr_idx].type != DLexer.LineType.HEADING:
+	if curr_line.type != DLexer.LineType.HEADING:
 		return
 	
 	curr_heading = get_curr_id()
 	curr_interrupts = {}
 	curr_speaker = ""
 	resource.lines.append(
-		DialogueLine.Title.new(get_curr_id(), lines[curr_idx].val, curr_interrupts.values())
+		DialogueLine.Title.new(get_curr_id(), curr_line.val, curr_interrupts.values())
 	)
 
 	curr_idx += 1
 	
-	while curr_idx < len(lines) and lines[curr_idx].type != DLexer.LineType.HEADING:
-		var line := lines[curr_idx]
+	while curr_idx < len(lines) and curr_line.type != DLexer.LineType.HEADING:
 		if parse_simple_line():
 			continue
 
-		match line.type:
+		match curr_line.type:
 			DLexer.LineType.INTERRUPT:
 				parse_interrupt()
 			DLexer.LineType.RESPONSE:
 				push_error("DParser error should be unreacheable")
 			_:
-				throw_error("Unexpected line type in heading block", line)
+				throw_error("Unexpected line type in heading block", curr_line)
 				curr_idx += 1
 			
 		
 ## Parses lines that can appear anywhere: turns, jumps, labels, character swaps, etc.
 func parse_simple_line() -> bool:
 	var did_parse := true
-	var line := lines[curr_idx]
 
-	match line.type:
+	match curr_line.type:
 		DLexer.LineType.LABEL:
 			resource.lines.append(
-				DialogueLine.Title.new(get_curr_id(), lines[curr_idx].val, curr_interrupts.values())
+				DialogueLine.Title.new(get_curr_id(), curr_line.val, curr_interrupts.values())
 			)
 			curr_idx += 1
 		DLexer.LineType.CHARACTER:
-			curr_speaker = line.val
+			curr_speaker = curr_line.val
 			curr_idx += 1
 		DLexer.LineType.SET:
 			parse_set()
@@ -280,22 +284,26 @@ func parse_simple_line() -> bool:
 			parse_execute()
 		DLexer.LineType.JUMP:
 			resource.lines.append(
-				DialogueLine.Jump.new(get_curr_id(), get_label_id(line.val), curr_interrupts.values())
+				DialogueLine.Jump.new(get_curr_id(), get_label_id(curr_line.val), curr_interrupts.values())
 			)
 			curr_idx += 1
 		DLexer.LineType.JUMP_RET:
 			resource.lines.append(
-				DialogueLine.JumpRet.new(get_curr_id(), get_label_id(line.val), curr_interrupts.values())
+				DialogueLine.JumpRet.new(get_curr_id(), get_label_id(curr_line.val), curr_interrupts.values())
 			)
 			curr_idx += 1
+		DLexer.LineType.IF:
+			parse_if_block()
+		DLexer.LineType.ELSE:
+			throw_error("Unexpected line type", curr_line)
 		DLexer.LineType.TURN:
 			if not curr_speaker:
-				throw_error("No speaker defined at this line", lines[curr_idx])
+				throw_error("No speaker defined at this line", curr_line)
 			if is_question():
 				parse_question()
 			else:
 				resource.lines.append(
-					DialogueLine.Turn.new(get_curr_id(), curr_speaker, line.val, curr_interrupts.values())
+					DialogueLine.Turn.new(get_curr_id(), curr_speaker, curr_line.val, curr_interrupts.values())
 				)
 				curr_idx += 1
 		_:
@@ -304,15 +312,14 @@ func parse_simple_line() -> bool:
 	return did_parse
 
 func parse_interrupt() -> void:
-	var line := lines[curr_idx]
-	var signal_name := line.val[0] as String
+	var signal_name := curr_line.val[0] as String
 
 	if not valid_name(signal_name):
-		throw_error("Could not find signal '" + str(signal_name) + "' in namespace", line)
+		throw_error("Could not find signal '" + str(signal_name) + "' in namespace", curr_line)
 		curr_idx += 1
 		return
 
-	var label := get_label_id(line.val[1] as String)
+	var label := get_label_id(curr_line.val[1] as String)
 	var interrupt := DialogueLine.InterruptJump.new(
 		get_head_segment(signal_name), 
 		get_sub_segments(signal_name), 
@@ -323,17 +330,16 @@ func parse_interrupt() -> void:
 	curr_idx += 1
 
 func parse_set() -> void:
-	var line := lines[curr_idx]
-	var lvalue := line.val[0] as String
+	var lvalue := curr_line.val[0] as String
 	if not valid_name(lvalue):
-		throw_error("Could not find variable '" + lvalue + "' in namespace", line)
+		throw_error("Could not find variable '" + lvalue + "' in namespace", curr_line)
 		curr_idx += 1
 		return
 
 	var value := Expression.new()
-	var err := value.parse(line.val[1], resource.aliases)
+	var err := value.parse(curr_line.val[1], resource.aliases)
 	if err != OK:
-		throw_error("Expression parse error: '" + value.get_error_text()+ "'", line)
+		throw_error("Expression parse error: '" + value.get_error_text()+ "'", curr_line)
 
 	resource.lines.append(
 		DialogueLine.Set.new(
@@ -346,11 +352,10 @@ func parse_set() -> void:
 	curr_idx += 1
 
 func parse_execute() -> void:
-	var line := lines[curr_idx]
 	var expr := Expression.new()
-	var err := expr.parse(line.val, resource.aliases)
+	var err := expr.parse(curr_line.val, resource.aliases)
 	if err != OK:
-		throw_error("Expression parse error: '" + expr.get_error_text()+ "'", line)
+		throw_error("Expression parse error: '" + expr.get_error_text()+ "'", curr_line)
 		
 	resource.lines.append(
 		DialogueLine.Execute.new(
@@ -361,19 +366,18 @@ func parse_execute() -> void:
 	curr_idx += 1
 
 func is_question() -> bool:
-	if lines[curr_idx].type != DLexer.LineType.TURN or curr_idx+1 == len(lines):
+	if curr_line.type != DLexer.LineType.TURN or curr_idx+1 == len(lines):
 		return false
 	
 	return lines[curr_idx+1].type == DLexer.LineType.RESPONSE
 
 func parse_question() -> void:
-	var line := lines[curr_idx]
 	var responses: Array[int] = []
 	resource.lines.append(
 		DialogueLine.Question.new(
 			get_curr_id(), 
 			curr_speaker, 
-			line.val, 
+			curr_line.val, 
 			responses, 
 			curr_interrupts.values())
 	)
@@ -382,25 +386,35 @@ func parse_question() -> void:
 
 	while curr_idx < len(lines):
 		var response_id := parse_response()
-		if response_id != -1:
+		if response_id != Dialogue.ID_UNDEF:
 			responses.append(response_id)
 		else:
 			break
 	
 	if len(responses) < 2:
 		return
+
 	for i in range(1, len(responses)):
 		var id := responses[i]-1
-		resource.lines[id].next_id = len(resource.lines)
+		if resource.lines[id].next_id_override == Dialogue.ID_UNDEF:
+			resource.lines[id].next_id_override = len(resource.lines)
 
-## Parses a response and returns its starting id. Returns -1 if none found
+func consume_block(ident: int):
+	while curr_idx < len(lines) and curr_line.indent > ident:
+		if parse_simple_line():
+			continue
+		else: 
+			throw_error("Unexpected line type in block", curr_line)
+			curr_idx += 1
+
+## Parses a response and returns its starting id. Returns Dialogue.ID_UNDEF if none found
 func parse_response() -> int:
-	if lines[curr_idx].type != DLexer.LineType.RESPONSE:
-		return -1
+	if curr_line.type != DLexer.LineType.RESPONSE:
+		return Dialogue.ID_UNDEF
 
-	var response: String = lines[curr_idx].val
+	var response: String = curr_line.val
 	var response_id := get_curr_id()
-	var response_indent := lines[curr_idx].indent
+	var response_indent := curr_line.indent
 	resource.lines.append(
 		DialogueLine.Response.new(
 			get_curr_id(), 
@@ -409,24 +423,66 @@ func parse_response() -> int:
 	)
 			
 	curr_idx += 1
-	
-	while curr_idx < len(lines) and lines[curr_idx].indent > response_indent:
-		var line := lines[curr_idx]
-		if parse_simple_line():
-			continue
-		else: 
-			throw_error("Unexpected line type in response block", line)
-			curr_idx += 1
-			return -1
-	
+	consume_block(response_indent)
 	return response_id
 
-func check_indentation() -> void:
+func parse_if_block() -> bool:
+	if curr_line.type != DLexer.LineType.IF:
+		return false
+
+	var if_id := get_curr_id()
+	var if_indent := curr_line.indent
+	var expr := Expression.new()
+	var err := expr.parse(curr_line.val, resource.aliases)
+	if err != OK:
+		throw_error("Expression parse error: '" + expr.get_error_text()+ "'", curr_line)
+
+	resource.lines.append(
+		DialogueLine.If.new(
+			if_id,
+			expr,
+			Dialogue.ID_UNDEF,
+			curr_interrupts.values()
+		)
+	)
+	curr_idx += 1
+	consume_block(if_indent)
+	resource.lines[if_id].else_id  = get_curr_id()
+	
+	if curr_idx == len(lines) or curr_line.type != DLexer.LineType.ELSE:
+		return true
+
+	var else_id := get_curr_id()
+	resource.lines.append(
+		DialogueLine.Else.new(
+			get_curr_id(),
+			curr_interrupts.values()
+		)
+	)
+	curr_idx += 1
+	consume_block(if_indent)
+	if resource.lines[else_id - 1].next_id_override == Dialogue.ID_UNDEF:
+			resource.lines[else_id - 1].next_id_override = get_curr_id()
+
+	return true
+
+func validate_indentation() -> void:
 	for i in range(len(lines)-1):
 		if lines[i].type == DLexer.LineType.RESPONSE:
 			continue
+		if lines[i].type in [DLexer.LineType.IF, DLexer.LineType.ELSE]:
+			continue
 		if lines[i].indent < lines[i+1].indent:
 			throw_error("Unexpected indent occurs at this line", lines[i+1])
+
+func validate_jump_label_ids() -> void:
+	for line in resource.lines:
+		if not line is DialogueLine.Jump:
+			continue
+		var jump_id = line.next_id_override
+		if jump_id != Dialogue.ID_END and not resource.lines[jump_id] is DialogueLine.Title:
+			push_error("Internal parser error has occurred. Jump id '" + str(jump_id) + "' does not point to a title")
+
 
 func display_debug() -> void:
 	for line in resource.lines:

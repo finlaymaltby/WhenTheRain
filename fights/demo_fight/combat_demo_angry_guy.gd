@@ -1,12 +1,12 @@
 class_name CombatDemoAngryGuy extends CombatAngryGuy
 
-## angy guy expecting you to attack?
-@onready var is_prepped := false
+@onready var already_smalltalked := false
 
 var enemy_very_close: PEvent
 var enemy_close: PEvent
 var enemy_leaves: PEvent
 var enemy_hit: PEvent
+var self_hit: PEvent
 
 func _ready() -> void:
 	super()
@@ -19,19 +19,19 @@ func _ready() -> void:
 	enemy_close = PEvent.EnemyNear.new(state, DIST_CLOSE)
 	enemy_leaves = PEvent.EnemyNotNear.new(state, DIST_CLOSE)
 	enemy_hit = PEvent.EnemyDamaged.new(state)
+	self_hit = PEvent.Damaged.new(state)
 
+	enemy_hit.firing.connect(func(ev): print("hit hit hit"))
 	dialogue = Dialogue.compile_from_raw(dialogue_path, [self, enemy_close], {})
 	
 	balloon.start(dialogue, "START")
 	
-	get_tree().create_timer(2).timeout.connect(swing)
+	
+	$OneWeaponManager.request_focus($OneWeaponManager/Sword)
 
 func _process(delta: float) -> void:
 	state.update.emit()
-
-func do(event):
-	balloon.jump_checked("on_approach", dialogue)
-
+	
 
 func get_move_dir() -> Vector2:
 	return Vector2.ZERO

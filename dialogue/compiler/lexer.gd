@@ -42,6 +42,10 @@ class Line extends RefCounted:
 				string += "JUMP RET |" + str(val) + "|"
 			LineType.INTERRUPT:
 				string += "WHEN ||" + str(val[0]) + "|| JUMP |" + str(val[1]) + "|"
+			LineType.IF:
+				string += "IF '" + str(val) + "'"
+			LineType.ELSE:
+				string += "ELSE"
 			LineType.TURN:
 				string += 'TURN "' + val + '"'
 			LineType.RESPONSE:
@@ -64,6 +68,9 @@ enum LineType {
 	JUMP,
 	JUMP_RET,
 	INTERRUPT,
+
+	IF,
+	ELSE,
 
 	TURN,
 	RESPONSE
@@ -131,7 +138,7 @@ func create_line() -> void:
 		if global.is_empty():
 			throw_error("Expected global identifer to follow import keyword")
 		skip_spaces()
-		if consume_once("AS"):
+		if consume_once("as"):
 			skip_spaces()
 			var alias := consume_ident()
 			if alias.is_empty():
@@ -222,6 +229,14 @@ func create_line() -> void:
 		consume_some("=")
 		make_line(LineType.HEADING, heading)
 
+	elif consume_once("if"):
+		skip_spaces()
+		var expr = consume_string()
+		make_line(LineType.IF, expr)
+
+	elif consume_once("else"):
+		make_line(LineType.ELSE, null)
+
 	else:
 		var line_text := consume_string()
 		make_line(LineType.TURN, line_text)
@@ -278,7 +293,8 @@ func consume_some(prefix: String) -> bool:
 	return true
 
 ## Consumes the entirety of the current line.
-## Duplicates and returns the line, setting curr_line to ""
+## Duplicates and returns the line, setting curr_line to "".
+## Cannot fail
 func consume_string() -> String:
 	var result := String(curr_line)
 	curr_line = ""

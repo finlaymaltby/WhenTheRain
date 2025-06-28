@@ -3,7 +3,10 @@ class_name Dialogue extends Node
 #region utils
 
 const ID_END: int = -1
+const ID_UNDEF: int = -10
 const AUTO_WAIT_TIME: float = 1
+
+
 
 static func _is_ident(s: String) -> bool:
 	return s.is_valid_ascii_identifier()
@@ -74,18 +77,18 @@ func next_turn() -> void:
 	if is_finished():
 		return
 	
-	_run_until_turn()
+	await _run_until_turn()
 
 func _run_until_turn() -> void:
 	while not is_finished():
-		_run()
+		await _run()
 
 		if _curr_line is DialogueLine.Turn:
 			curr_turn = _curr_line
 			return
 
 func _run() -> void:
-	_curr_id = _curr_line.next_id
+	_curr_id = _curr_line.next_id()
 
 	if _curr_line is DialogueLine.Mutation:
 		await _curr_line.run_mutation(self) 

@@ -3,18 +3,20 @@ class_name DialogueLine extends RefCounted
 const _DISPLAY_BODY_LEN := 50
 
 var id: int
-var next_id: int
+var next_id_override: int = Dialogue.ID_UNDEF
 var interrupts: Array[Interrupt]
+
+func next_id() -> int:
+	return (id + 1) if next_id_override == Dialogue.ID_UNDEF else next_id_override
 
 func _init(_id: int, _interrupts: Array[Interrupt]) -> void:
 	id = _id
-	next_id = id + 1
 	interrupts = _interrupts
 
 func _to_string() -> String:
 	var left :=  "%2d: " % id + __to_string()
 
-	return left.rpad(_DISPLAY_BODY_LEN, " ") + " (=>" + str(next_id) + ") " + str(interrupts)
+	return left.rpad(_DISPLAY_BODY_LEN, " ") + " (=>" + str(next_id()) + ") " + str(interrupts)
 
 func __to_string() -> String:
 	push_error("override")
@@ -25,7 +27,6 @@ class Title extends DialogueLine:
 
 	func _init(_id: int, _name: String, _interrupts: Array[Interrupt]) -> void:
 		id = _id
-		next_id = id + 1
 		name = _name
 		interrupts = _interrupts.duplicate()
 
@@ -39,7 +40,6 @@ class Turn extends DialogueLine:
 
 	func _init(_id: int, _speaker: String, _text: String, _interrupts: Array[Interrupt]) -> void:
 		id = _id
-		next_id = id + 1
 		speaker = _speaker
 		text = _text
 		interrupts = _interrupts
@@ -52,7 +52,6 @@ class Question extends Turn:
 
 	func _init(_id: int, _speaker: String, _text: String, _responses: Array[int],  _interrupts: Array[Interrupt]) -> void:
 		id = _id
-		next_id = id + 1
 		speaker = _speaker
 		text = _text
 		responses = _responses
@@ -65,7 +64,6 @@ class Response extends DialogueLine:
 	var text: String
 	func _init(_id: int, _text: String, _interrupts: Array[Interrupt]) -> void:
 		id = _id
-		next_id = id + 1
 		text = _text
 		interrupts = _interrupts
 
@@ -88,7 +86,6 @@ class Set extends Mutation:
 
 	func _init(_id: int, _obj_name: String, _property_path: String, _value: Expression, _interrupts: Array[Interrupt]) -> void:
 		id = _id
-		next_id = id + 1
 		interrupts = _interrupts
 		obj_name = _obj_name
 		property = _property_path
@@ -110,7 +107,6 @@ class Execute extends Mutation:
 	var expr: Expression
 	func _init(_id: int, _expr: Expression, _interrupts: Array[Interrupt]) -> void:
 		id = _id
-		next_id = id+1
 		expr = _expr
 		interrupts = _interrupts
 		
@@ -127,7 +123,7 @@ class Jump extends DialogueLine:
 	func _init(_id: int, _jump_id: int, _interrupts: Array[Interrupt]) -> void:
 		id = _id
 		
-		next_id = _jump_id
+		next_id_override = _jump_id
 		interrupts = _interrupts
 
 	func __to_string() -> String:
@@ -135,8 +131,52 @@ class Jump extends DialogueLine:
 
 class JumpRet extends Jump:
 	func _to_string() -> String:
-		return str(id) + ": (=><" + str(next_id) + ")" + str(interrupts)
+		return str(id) + ": (=><" + str(next_id_override) + ")" + str(interrupts)
 
+class If extends Mutation:
+	var expr: Expression
+	var else_id: int
+
+	func _init(_id, _expr: Expression, _else_id: int, _interrupts: Array[Interrupt]) -> void:
+		id = _id
+		next_id_override = Dialogue.ID_UNDEF
+		expr = _expr
+		else_id = _else_id
+		interrupts = _interrupts
+
+	func run_mutation(dialogue: Dialogue) -> void:
+		var result = await expr.execute(dialogue.object_bindings.values(), dialogue.object_bindings.get("", null))
+		
+		if expr.has_execute_failed():
+			push_error("Execution error '" + expr.get_error_text() + "' in " + str(self))
+		
+		if result:
+			next_id_override = id + 1
+		else:
+			next_id_override = else_id
+
+	func next_id() -> int:
+		if next_id_override == Dialogue.ID_UNDEF:
+			breakpoint
+			push_error("Asking for next line on an if statement that hasn't been mutated")
+			return Dialogue.ID_UNDEF
+
+		var ret := next_id_override
+		next_id_override = Dialogue.ID_UNDEF
+		return ret
+	
+	func _to_string() -> String:
+		return str(id) + "IF " + Dialogue._expr_to_string(expr) + " (else =>" + str(else_id) + ") " + str(interrupts)
+
+
+class Else extends DialogueLine:
+	func _init(_id: int, _interrupts: Array[Interrupt]) -> void:
+		id = _id
+		next_id_override = id + 1
+		interrupts = _interrupts
+
+	func __to_string() -> String:
+		return "ELSE"
 
 class Interrupt extends RefCounted:
 	var obj_name: String 

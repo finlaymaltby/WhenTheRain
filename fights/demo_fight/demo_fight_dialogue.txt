@@ -1,17 +1,29 @@
-import DialogueStdLib
+import DialogueStdLib as std
 require using CombatDemoAngryGuy
 require PEvent as pe
 
+
+
 == START ==
-? enemy_very_close.firing => EVILING
+? enemy_close.firing => CLOSE_UNEASY
 ? enemy_very_close.firing => VERY_CLOSE_UNEASY
 ? enemy_hit.firing => HIT_THEM
+? self_hit.firing => EVILING
 * Guy
+$ already_smalltalked = false
 Hello friend
 How are you
 Let's have a chat at a nice distance
 No need to get too close or anything
+
 ~ small_talk
+if already_smalltalked
+	More smalltalk again, huh
+	crazy stuff
+else
+	$ already_smalltalked = true
+	woah exciting let's do some small talk
+
 So how's your day ig
 More liens
 ore lines 2
@@ -21,29 +33,59 @@ I'm going to procedurally loop my dialogue now
 => small_talk
 
 == CLOSE_UNEASY == 
+? enemy_leaves.firing => agreed_to_leave
 ? enemy_very_close.firing => VERY_CLOSE_UNEASY
+? enemy_hit.firing => HIT_THEM
+? self_hit.firing => EVILING
 * Guy
-Hey no need to get so close okay mate
+So there's no need to get so close okay mate
 I'm practising with my sword here
 Can you move back and give me some space
+if std.when_or_wait(enemy_leaves, 5)
+	~ agreed_to_leave
+	Okay thanks so much
+	=> small_talk
+else
+	What did I just SAY
+	are you just gonna stand there what da helly
+	Get back or I'm gonna have to start smalltalking anyway at this uncomfortable distance
+	I'm gonna do it
+	It's gonna happen
+	get ready
+	okay
+	now
+	it's happening
+	=> small_talk
+
 = agreed
 
 
 == VERY_CLOSE_UNEASY == 
+? enemy_hit.firing => HIT_THEM
+? self_hit.firing => EVILING
 * Guys
 WOAH WAOH GET BACK
-N
+WHAT DID I SAY
+I COULD HAVE HIT YOU 
 
 
 == HIT_THEM == 
+? self_hit.firing => EVILING
 * Guy
 OH NO I'VE HIT YOU I'M SO SORRY PLEASE FORGIVE ME
 :(
 :(
-
+:(
+I'll just go now
+! queue_free()
 
 == EVILING == 
 * Guy
+You have hit me
+You know what happens now
+* Evil Guy
+~ evil_time
 Hello I am evil Guy
 I am evilling it
 I am evilling it so good
+=> evil_time

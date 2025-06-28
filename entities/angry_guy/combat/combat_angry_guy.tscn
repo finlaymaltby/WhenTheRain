@@ -381,6 +381,7 @@ tracks/8/keys = {
 
 [sub_resource type="Animation" id="Animation_4wd4x"]
 resource_name = "attack"
+loop_mode = 1
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -667,4 +668,4 @@ animation = &"idle"
 libraries = {
 &"": SubResource("AnimationLibrary_bmvja")
 }
-autoplay = "RESET"
+autoplay = "attack"
