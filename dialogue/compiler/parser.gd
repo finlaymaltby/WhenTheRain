@@ -295,7 +295,8 @@ func parse_simple_line() -> bool:
 		DLexer.LineType.IF:
 			parse_if_block()
 		DLexer.LineType.ELSE:
-			throw_error("Unexpected line type", curr_line)
+			throw_error("Did not expect else without preceding if", curr_line)
+			curr_idx += 1
 		DLexer.LineType.TURN:
 			if not curr_speaker:
 				throw_error("No speaker defined at this line", curr_line)
@@ -429,7 +430,7 @@ func parse_response() -> int:
 func parse_if_block() -> bool:
 	if curr_line.type != DLexer.LineType.IF:
 		return false
-
+	
 	var if_id := get_curr_id()
 	var if_indent := curr_line.indent
 	var expr := Expression.new()
@@ -445,6 +446,7 @@ func parse_if_block() -> bool:
 			curr_interrupts.values()
 		)
 	)
+
 	curr_idx += 1
 	consume_block(if_indent)
 	resource.lines[if_id].else_id  = get_curr_id()
@@ -468,6 +470,8 @@ func parse_if_block() -> bool:
 
 func validate_indentation() -> void:
 	for i in range(len(lines)-1):
+		if lines[i].type == DLexer.LineType.HEADING:
+			continue
 		if lines[i].type == DLexer.LineType.RESPONSE:
 			continue
 		if lines[i].type in [DLexer.LineType.IF, DLexer.LineType.ELSE]:
