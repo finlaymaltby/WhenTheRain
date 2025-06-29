@@ -8,7 +8,6 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	pass
-
 	
 func _physics_process(delta: float) -> void:
 	var move_type := process_movement(delta)
@@ -34,5 +33,5 @@ func swing() -> void:
 func laser() -> void:
 	$OneWeaponManager/LaserGun.run()
 
-func _on_health_component_health_died(dmg_taken: float) -> void:
-	queue_free()
+func _on_health_died(dmg_taken: float) -> void:
+	balloon.jump_checked("on_death", dialogue)

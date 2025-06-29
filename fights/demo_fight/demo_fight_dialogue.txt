@@ -13,7 +13,7 @@ require PEvent as pe
 	How are you
 	Let's have a chat at a nice distance
 	No need to get too close or anything
-
+	
 	~ small_talk
 	if already_smalltalked
 		More smalltalk again, huh
@@ -31,29 +31,29 @@ require PEvent as pe
 	=> small_talk
 
 == CLOSE_UNEASY == 
-? enemy_leaves.firing => agreed_to_leave
 ? enemy_very_close.firing => VERY_CLOSE_UNEASY
 ? enemy_hit.firing => HIT_THEM
 ? self_hit.firing => EVILING
 * Guy
 So there's no need to get so close okay mate
+? enemy_leaves.firing => agreed_to_leave
 I'm practising with my sword here
 Can you move back and give me some space
-if std.when_or_wait(enemy_leaves, 5)
-	~ agreed_to_leave
-	Okay thanks so much
-	=> small_talk
-else
-	What did I just SAY
-	are you just gonna stand there what da helly
-	Get back or I'm gonna have to start smalltalking anyway at this uncomfortable distance
-	I'm gonna do it
-	It's gonna happen
-	get ready
-	okay
-	now
-	it's happening
-	=> small_talk
+! wait(5)
+What did I just SAY
+are you just gonna stand there what da helly
+Get back or I'm gonna have to start smalltalking anyway at this uncomfortable distance
+I'm gonna do it
+It's gonna happen
+get ready
+okay
+now
+it's happening
+=> small_talk
+
+~ agreed_to_leave
+Okay thanks so much
+=> small_talk
 
 
 == VERY_CLOSE_UNEASY == 
@@ -63,7 +63,8 @@ else
 WOAH WAOH GET BACK
 WHAT DID I SAY
 I COULD HAVE HIT YOU 
-
+Well seems like things are okay ig
+=> small_talk
 
 == HIT_THEM == 
 ? self_hit.firing => EVILING
@@ -82,6 +83,13 @@ You know what happens now
 * Evil Guy
 ~ evil_time
 Hello I am evil Guy
-I am evilling it
-I am evilling it so good
+I am evil now
+#I am evilling it
+#I am evilling it so good
 => evil_time
+
+== on_death ==
+* Guy
+AAAAA 
+You have killed me :(
+! queue_free()

@@ -1,5 +1,8 @@
 extends Node
 
+func wait(dur: float) -> void:
+	await get_tree().create_timer(dur).timeout
+
 ## function returns when the signal fires
 func until(sig: Signal) -> void:
 	await sig
