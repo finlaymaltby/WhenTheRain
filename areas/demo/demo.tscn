@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://dfkvei8icnjje"]
+[gd_scene load_steps=12 format=3 uid="uid://dfkvei8icnjje"]
 
 [ext_resource type="Script" uid="uid://cewe66a1fglbx" path="res://areas/demo/demo.gd" id="1_f2jw5"]
 [ext_resource type="Texture2D" uid="uid://bfqowsjqa5xxp" path="res://areas/demo/StonyBackground.png" id="1_i22nb"]
@@ -9,6 +9,20 @@
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lvddk"]
 radius = 83.006
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_aifmi"]
+distance = -540.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_yfm5w"]
+normal = Vector2(0, 1)
+distance = -960.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_mgr0u"]
+normal = Vector2(-1, 0)
+distance = -540.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_sxwg2"]
+distance = -960.0
 
 [node name="DemoScene" type="Node" node_paths=PackedStringArray("default_balloon")]
 script = ExtResource("1_f2jw5")
@@ -65,3 +79,23 @@ position = Vector2(-4, -68)
 shape = SubResource("CircleShape2D_lvddk")
 
 [node name="DefaultBalloon" parent="." instance=ExtResource("7_lvddk")]
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+position = Vector2(960, 540)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
+rotation = -7.40595e-05
+shape = SubResource("WorldBoundaryShape2D_aifmi")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D2"]
+rotation = -1.57404
+shape = SubResource("WorldBoundaryShape2D_yfm5w")
+disabled = true
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D2"]
+rotation = -1.57259
+shape = SubResource("WorldBoundaryShape2D_mgr0u")
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D2"]
+rotation = -1.57404
+shape = SubResource("WorldBoundaryShape2D_sxwg2")
